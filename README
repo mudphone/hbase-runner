@@ -5,3 +5,22 @@ Do not feed the bears.
 shared shared shared, shared nothing
 
 Author: Kyle Oba ;; mudphone ;; kyleoba <@> gmail.com
+---------------------- -- -- -- - - ---- -- - -- -- --- -- - -- --- - - -- -- - - - -
+
+Some notes:
+- This currently works with HBase 0.20.0 and as such the HBase 0.20.0 jar must be on 
+  your classpath.
+
+...... .  . ..... .. .. . .. .................................. ... .... .. ... . ...
+Instructions for use... While in the REPL...
+
+Either do this:
+> (require 'mudphone.hbase-runner.repl-cheat)
+> (in-ns 'mudphone.hbase-runner.repl-cheat) 
+> (list-tables)
+
+Or, do this:
+> (use 'mudphone.hbase-runner.repl-cheat)
+> (list-tables)
+
+Enjoy!
