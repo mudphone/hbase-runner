@@ -17,13 +17,11 @@
 
 (defn hbase-configuration []
   (HBaseConfiguration.))
-;;(def *HBaseConfiguration* (hbase-configuration))
 
 (defn hbase-admin []
   (HBaseAdmin. *HBaseConfiguration*))
-;;(def *HBaseAdmin* (hbase-admin))
 
-(defn start-hbase-shell []
+(defn start-hbase-repl []
   (def *HBaseConfiguration* (hbase-configuration))
   (def *HBaseAdmin* (hbase-admin)))
 
@@ -31,16 +29,23 @@
   (String. (.getName htable-descriptor)))
 
 (defn- is-in-table-ns [table-name]
-  (not (nil? (re-find (re-pattern (str "^" *current-table-ns*)) table-name))))
+  (not (nil? (re-find (re-pattern (str "^" (current-table-ns))) table-name))))
 
 (defn list-all-tables []
   (let [htable-descriptors (.listTables *HBaseAdmin*)]
     (map table-name-from htable-descriptors)))
 
 (defn list-tables []
-  (let [tables (list-all-tables)
-        ns-tables (filter is-in-table-ns tables)]
-    (remove nil? ns-tables)))
+  (filter is-in-table-ns (list-all-tables)))
+
+(defn filter-names-by [search-str names]
+  (filter #(re-find (re-pattern search-str) %) names))
+
+(defn find-all-tables [search-str]
+  (filter-names-by search-str (list-all-tables)))
+
+(defn find-tables [search-str]
+  (filter-names-by search-str (list-tables)))
 
 (defn table-enabled? [table-name]
   (.isTableEnabled *HBaseAdmin* table-name))
@@ -73,8 +78,14 @@
   (.createTable *HBaseAdmin* descriptor))
 
 (defn truncate-table [table-name]
+  (println "Truncating table" table-name "...")
   (let [descriptor (.getTableDescriptor (HTable. table-name))]
     (disable-table table-name)
     (drop-table table-name)
     (println "Recreating table" table-name "...")
-    (create-table-from descriptor)))
+    (create-table-from descriptor))
+  (str "truncated:" table-name))
+
+(defn truncate-tables [table-name-list]
+  (println "Truncating" (count table-name-list) "tables ...")
+  (pmap truncate-table table-name-list))
