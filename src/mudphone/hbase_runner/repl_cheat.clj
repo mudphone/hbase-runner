@@ -79,12 +79,15 @@
 
 (defn truncate-table [table-name]
   (println "Truncating table" table-name "...")
-  (let [descriptor (.getTableDescriptor (HTable. table-name))]
-    (disable-table table-name)
-    (drop-table table-name)
-    (println "Recreating table" table-name "...")
-    (create-table-from descriptor))
-  (str "truncated:" table-name))
+  (try
+   (let [descriptor (.getTableDescriptor (HTable. table-name))]
+     (disable-table table-name)
+     (drop-table table-name)
+     (println "Recreating table" table-name "...")
+     (create-table-from descriptor)
+     {:truncated table-name})
+   (catch Exception e
+     {:error table-name})))
 
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")
