@@ -91,8 +91,12 @@
      (create-table-from descriptor)
      {:truncated table-name})
    (catch Exception e
+     (.printStackTrace e)
      {:error table-name})))
 
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")
   (doall (pmap truncate-table table-name-list)))
+
+(defn filter-errors [results]
+  (filter #(= :error (key (first %))) results))
