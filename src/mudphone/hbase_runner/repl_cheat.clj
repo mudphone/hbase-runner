@@ -91,4 +91,4 @@
 
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")
-  (pmap truncate-table table-name-list))
+  (doall (pmap truncate-table table-name-list)))
