@@ -21,9 +21,13 @@
 (defn hbase-admin []
   (HBaseAdmin. *HBaseConfiguration*))
 
-(defn start-hbase-repl []
-  (def *HBaseConfiguration* (hbase-configuration))
-  (def *HBaseAdmin* (hbase-admin)))
+(defn start-hbase-repl
+  ([]
+     (def *HBaseConfiguration* (hbase-configuration))
+     (def *HBaseAdmin* (hbase-admin)))
+  ([table-ns]
+     (set-current-table-ns table-ns)
+     (start-hbase-repl)))
 
 (defn- table-name-from [htable-descriptor]
   (String. (.getName htable-descriptor)))
