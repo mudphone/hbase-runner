@@ -1,6 +1,7 @@
 (ns mudphone.hbase-runner.hbase-repl
   (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants HTableDescriptor])
   (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable])
+  (:use mudphone.hbase-runner.utils.file)
   (:use mudphone.hbase-runner.utils.find)
   (:use mudphone.hbase-runner.utils.create)
   (:use clojure.contrib.pprint))
@@ -93,3 +94,9 @@
 
 (defn filter-errors [results]
   (filter #(= :error (key (first %))) results))
+
+(defn dump-table [table-name]
+  (let [file (str *output-dir* "/tables.clj")
+        table-map (table-map-for table-name)]
+    (spit file table-map)))
+

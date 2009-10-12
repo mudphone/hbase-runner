@@ -23,24 +23,19 @@
    :in-memory (.isInMemory hcolumn-descriptor)
    :block-cache-enabled (.isBlockCacheEnabled hcolumn-descriptor)})
 
-(defn- table-map-for [table-name]
+(defn table-map-for [table-name]
   (let [table-descriptor (table-descriptor-for table-name)
         hcolumn-descriptors (.getFamilies table-descriptor)
         table-map {:name (.getNameAsString table-descriptor)}
         family-maps (map #(family-map-from-hcolumn-descriptor %) hcolumn-descriptors )]
     (assoc table-map :families (into-array family-maps))))
 
-(defn dump-table [table-name]
-  (let [file (str *output-dir* "/tables.clj")
-        table-map (table-map-for table-name)]
-    (spit file table-map)))
-
 (defn dump-table-to-ruby [table-name]
   (let [file (str *output-dir* "/tables.rb")]
     (spit file (str (table-descriptor-for table-name)))))
                                                                             
 (defn dump-tables-to-ruby [table-names]
-  (map dump-table table-names))
+  (map dump-table-to-ruby table-names))
 
-(defn hydrate-tables-from [file]
+(defn hydrate-table-maps-from [file]
   (map read-clojure-str (lines-of-file file)))
