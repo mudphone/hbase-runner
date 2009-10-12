@@ -25,6 +25,7 @@ if [ -x "${RLWRAP_PATH}" -a -r "${CLJ_COMPLETIONS_PATH}" ]; then
   java_cmd="java -cp ${CP} clojure.lang.Repl"
   cmd="rlwrap --remember -c -b ${BREAK_CHARS} -f ${CLJ_COMPLETIONS_PATH} ${java_cmd}"
 else
+  # If no rlwrap available, use JLine instead:
   cmd="java -cp ${CP} jline.ConsoleRunner clojure.lang.Repl"
 fi
  
