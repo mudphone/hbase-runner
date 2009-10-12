@@ -1,6 +1,7 @@
 (ns mudphone.hbase-runner.repl-cheat
   (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants HTableDescriptor])
-  (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable]))
+  (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable])
+  (:use clojure.contrib.pprint))
 
 (def *default-table-ns* "koba_development")
 (def *current-table-ns* (atom ""))
@@ -96,7 +97,9 @@
 
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")
-  (doall (pmap truncate-table table-name-list)))
+  (let [result (doall (pmap truncate-table table-name-list))]
+    
+    ))
 
 (defn filter-errors [results]
   (filter #(= :error (key (first %))) results))
