@@ -47,3 +47,9 @@ Or, do this:
 > (list-all-tables)
 
 Enjoy!
+
+>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
+
+Thanks go to:
+  Amit Rathore - Much code was taken from his clojure util libraries.
+  Clojure Contrib Authors - I borrowed and stole much.

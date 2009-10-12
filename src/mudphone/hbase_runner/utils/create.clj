@@ -43,5 +43,4 @@
   (map dump-table table-names))
 
 (defn hydrate-tables-from [file]
-  (doseq [line (lines-of-file file)]
-    (println (read-clojure-str line))))
+  (map read-clojure-str (lines-of-file file)))

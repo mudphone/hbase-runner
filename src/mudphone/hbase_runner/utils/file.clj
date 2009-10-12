@@ -1,7 +1,8 @@
 (ns mudphone.hbase-runner.utils.file
   (:import (java.io BufferedReader BufferedWriter File FileInputStream FileWriter InputStreamReader)
            (org.apache.commons.io FileUtils))
-  (:use clojure.contrib.pprint))
+  (:use clojure.contrib.pprint)
+  (:require [clojure.contrib.str-utils2 :as su2]))
 
 (defn spit [f content] 
   (let [file (File. f)]
@@ -9,8 +10,9 @@
       (FileUtils/touch file))
     (with-open [#^FileWriter fw (FileWriter. f true)]
       (with-open [#^BufferedWriter bw (BufferedWriter. fw)]
-        (.write bw
-                (with-out-str (pprint content)))))))
+        (let [pretty-content (with-out-str (pprint content))
+              single-line (su2/replace pretty-content "\n" "")]
+          (.write bw single-line))))))
 
 (defn lines-of-file [file-name]
  (line-seq
