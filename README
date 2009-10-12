@@ -32,18 +32,18 @@ Some notes:
 Instructions for use:
 
 To get a REPL, you can run
-$ ${HBASE_RUNNER_HOME}/hbase-repl
+$ ${HBASE_RUNNER_HOME}/hbase-repl.sh
 
 
 While in the REPL...
 
 Either do this:
-> (require 'mudphone.hbase-runner.repl-cheat)
-> (in-ns 'mudphone.hbase-runner.repl-cheat) 
-> (list-tables)
+> (require 'mudphone.hbase-runner.hbase-repl)
+> (in-ns 'mudphone.hbase-runner.hbase-repl) 
+> (list-all-tables)
 
 Or, do this:
-> (use 'mudphone.hbase-runner.repl-cheat)
-> (list-tables)
+> (use 'mudphone.hbase-runner.hbase-repl)
+> (list-all-tables)
 
 Enjoy!

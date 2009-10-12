@@ -1,6 +1,8 @@
-(ns mudphone.hbase-runner.repl-cheat
+(ns mudphone.hbase-runner.hbase-repl
   (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants HTableDescriptor])
   (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable])
+  (:use mudphone.hbase-runner.utils.find)
+  (:use mudphone.hbase-runner.utils.create)
   (:use clojure.contrib.pprint))
 
 (def *default-table-ns* "koba_development")
@@ -30,21 +32,12 @@
      (set-current-table-ns table-ns)
      (start-hbase-repl)))
 
-(defn- table-name-from [htable-descriptor]
-  (String. (.getName htable-descriptor)))
-
-(defn- is-in-table-ns [table-name]
-  (not (nil? (re-find (re-pattern (str "^" (current-table-ns))) table-name))))
-
 (defn list-all-tables []
   (let [htable-descriptors (.listTables *HBaseAdmin*)]
     (map table-name-from htable-descriptors)))
 
 (defn list-tables []
-  (filter is-in-table-ns (list-all-tables)))
-
-(defn filter-names-by [search-str names]
-  (filter #(re-find (re-pattern search-str) %) names))
+  (filter (partial is-in-table-ns (current-table-ns)) (list-all-tables)))
 
 (defn find-all-tables [search-str]
   (filter-names-by search-str (list-all-tables)))
@@ -79,9 +72,6 @@
   (println "Disabling table" table-name "...")
   (.disableTable *HBaseAdmin* table-name))
 
-(defn- create-table-from [descriptor]
-  (.createTable *HBaseAdmin* descriptor))
-
 (defn truncate-table [table-name]
   (println "Truncating table" table-name "...")
   (try
@@ -89,7 +79,7 @@
      (disable-table table-name)
      (drop-table table-name)
      (println "Recreating table" table-name "...")
-     (create-table-from descriptor)
+     (create-table-from *HBaseAdmin* descriptor)
      {:truncated table-name})
    (catch Exception e
      (.printStackTrace e)
