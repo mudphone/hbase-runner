@@ -1,21 +1,47 @@
 (ns mudphone.hbase-runner.utils.create
-  (:import (java.io FileWriter BufferedWriter File)
-           (org.apache.commons.io FileUtils))
-  (:import [org.apache.hadoop.hbase.client HTable]))
+  (:import [org.apache.hadoop.hbase.client HTable])
+  (:use mudphone.hbase-runner.utils.clojure)
+  (:use mudphone.hbase-runner.utils.file))
+
+(def *output-dir* "/Users/koba/work/clojure/hbase-runner/output")
 
 (defn create-table-from [hbase-admin descriptor]
   (.createTable hbase-admin descriptor))
 
-(defn spit [f content] 
-  (let [file (File. f)]
-    (if (not (.exists file))
-      (FileUtils/touch file))
-    (with-open [#^FileWriter fw (FileWriter. f true)]
-      (with-open [#^BufferedWriter bw (BufferedWriter. fw)]
-        (.write bw (str content "\n"))))))
+(defn- table-descriptor-for [table-name]
+  (.getTableDescriptor (HTable. table-name)))
 
-(defn dump-tables [table-names]
-  (let [file "/Users/koba/tables.txt"
-        spit-descriptor-hash (fn [table-name]
-                               (spit file (str (.getTableDescriptor (HTable. table-name)))))]
-      (map spit-descriptor-hash table-names)))
+(defn- compression-name-for [hcolumn-descriptor]
+  (.getName (.getCompression hcolumn-descriptor)))
+
+(defn- family-map-from-hcolumn-descriptor [hcolumn-descriptor]
+  {:name (.getNameAsString hcolumn-descriptor)
+   :compression (compression-name-for hcolumn-descriptor)
+   :versions (.getMaxVersions hcolumn-descriptor)
+   :ttl (.getTimeToLive hcolumn-descriptor)
+   :blocksize (.getBlocksize hcolumn-descriptor)
+   :in-memory (.isInMemory hcolumn-descriptor)
+   :block-cache-enabled (.isBlockCacheEnabled hcolumn-descriptor)})
+
+(defn- table-map-for [table-name]
+  (let [table-descriptor (table-descriptor-for table-name)
+        hcolumn-descriptors (.getFamilies table-descriptor)
+        table-map {:name (.getNameAsString table-descriptor)}
+        family-maps (map #(family-map-from-hcolumn-descriptor %) hcolumn-descriptors )]
+    (assoc table-map :families (into-array family-maps))))
+
+(defn dump-table [table-name]
+  (let [file (str *output-dir* "/tables.clj")
+        table-map (table-map-for table-name)]
+    (spit file table-map)))
+
+(defn dump-table-to-ruby [table-name]
+  (let [file (str *output-dir* "/tables.rb")]
+    (spit file (str (table-descriptor-for table-name)))))
+                                                                            
+(defn dump-tables-to-ruby [table-names]
+  (map dump-table table-names))
+
+(defn hydrate-tables-from [file]
+  (doseq [line (lines-of-file file)]
+    (println (read-clojure-str line))))
