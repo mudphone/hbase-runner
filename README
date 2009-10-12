@@ -4,15 +4,38 @@ Do not feed the bears.
 
 shared shared shared, shared nothing
 
-Author: Kyle Oba ;; mudphone ;; kyleoba <@> gmail.com
+Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 ---------------------- -- -- -- - - ---- -- - -- -- --- -- - -- --- - - -- -- - - - -
 
 Some notes:
 - This currently works with HBase 0.20.0 and as such the HBase 0.20.0 jar must be on 
-  your classpath.
+  your classpath.  It is currently included in lib/java and is put on the REPL
+  classpath, if you use the included hbase-repl script.
+
+- For rlwrap goodness at the REPL (including tab-completion):
+  1) make sure you have rlwrap installed (you can get it from macports if you're a 
+     mac drone).  
+  2) Also, set up your ~/.inputrc file (a sample is in config/.inputrc).  
+  3) Then, create a ~/.clj_completions file (you can run utils/completions.clj to 
+  create one). Run this:
+    $> hbase-repl.sh utils/completions.clj
+
+- Truncating tables in a pmap is great because it's fast.  However, since the
+  truncate calls are executed in agents, the output of the command is not seen.
+  The truncate-tables command set up to return a list of maps, which are keyed with
+  either :truncated or :error.  There is one map per truncated table.  This return
+  structure allows you to see if everything ran as expected.
+
+- Chimpanzees and humans come from a common ancestor.
 
 ...... .  . ..... .. .. . .. .................................. ... .... .. ... . ...
-Instructions for use... While in the REPL...
+Instructions for use:
+
+To get a REPL, you can run
+$ ${HBASE_RUNNER_HOME}/hbase-repl
+
+
+While in the REPL...
 
 Either do this:
 > (require 'mudphone.hbase-runner.repl-cheat)
