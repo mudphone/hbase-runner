@@ -89,7 +89,7 @@
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")
   (let [result (doall (pmap truncate-table table-name-list))]
-    
+    result
     ))
 
 (defn filter-errors [results]
