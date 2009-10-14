@@ -10,7 +10,7 @@ CP_JARS="${CLOJURE_DIR}/*"
 CP="${CP_JARS}:${HBASE_RUNNER_HOME}/src"
 
 # Add extra classpath, if any -- for example the location of hbase-site.xml.
-if [ -z ${HBR_XCP} ]; then
+if [ ! -z "${HBR_XCP}" ]; then
   CP="${CP}:${HBR_XCP}"
 fi
 
