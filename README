@@ -40,8 +40,11 @@ Some notes:
 ...... .  . ..... .. .. . .. .................................. ... .... .. ... . ...
 Instructions for use:
 
-To get a REPL, you can run
-$ ${HBASE_RUNNER_HOME}/hbase-repl.sh
+To get a REPL, you can use the hbase-repl.sh script:
+  1) Open hbase.repl.sh and update the HBASE_RUNNER_HOME environment variable.
+     It should be the directory that you just cloned from GitHub.
+  2) Run it:
+    $> ${HBASE_RUNNER_HOME}/hbase-repl.sh
 
   Note: Since hbase-repl.sh uses rlwrap, if you have it installed, you will get
   Clojure and HBase-Runner tab-completion!
@@ -95,6 +98,29 @@ Truncated tables are keyed with :trunacted.  If there was an error on truncation
 they will be keyed with :error.  You will want to check the console output if there
 were errors.  Also, try enable/disable on the tables, as this is frequently a
 problem.
+
+The current public API includes:
+
+current-table-ns []
+disable-table [table-name]
+drop-table [table-name]
+dump-table [table-name]
+filter-errors [results]
+find-all-tables [search-str]
+find-tables [search-str]
+flush-table [table-name]
+flush-table-or-region [table-name-or-region-name]
+hbase-admin []
+hbase-configuration []
+list-all-tables []
+list-tables []
+major-compact [table-name-or-region-name]
+set-current-table-ns [current-ns]
+start-hbase-repl
+table-disabled? [table-name]
+table-enabled? [table-name]
+truncate-table [table-name]
+truncate-tables [table-name-list]
 
 
 Enjoy!
