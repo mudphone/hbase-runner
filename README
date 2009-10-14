@@ -10,11 +10,16 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 Some notes:
 - This currently works with HBase 0.20.0 and as such the HBase 0.20.0 jar must be on 
   your classpath.  It is currently included in lib/java and is put on the REPL
-  classpath, if you use the included hbase-repl script.
+  classpath, if you use the included hbase-repl.sh script.
 
 - While we're on the subject of the classpath, you must have the hbase-site.xml file
   for your HBase set-up in the classpath.  This is how you'll connect to ZK.  I
   think there may be other ways to do this, but I haven't thought of how to do it.
+  
+  In order to get your hbase-site.xml file on the classpath, you can also invoke the
+  hbase-repl.sh script with the HBR_XCP environment variable, pointing to the
+  directory, containing the file.
+    $> HBR_XCP=/path/to/hbase-site.xml/dir ./hbase-repl.sh
 
 - For rlwrap goodness at the REPL (including tab-completion):
   1) make sure you have rlwrap installed (you can get it from macports if you're a 
@@ -38,36 +43,55 @@ Instructions for use:
 To get a REPL, you can run
 $ ${HBASE_RUNNER_HOME}/hbase-repl.sh
 
-Note: Since hbase-repl.sh uses rlwrap, if you have it installed, you will get
-Clojure and HBase-Runner tab-completion!
+  Note: Since hbase-repl.sh uses rlwrap, if you have it installed, you will get
+  Clojure and HBase-Runner tab-completion!
+    For example: > (truncate-t<tab> ;;=> (truncate-table
+    See rlwrap note above to set up your list of completions.
+
+  Users of the hbase-repl.sh script, do not have to explicity "use" the library
+  because it is automatically loaded by the script.
+
+If you're using Emacs, and you're working with Slime, you can include the library
+like this:
+  > (require 'mudphone.hbase-runner.hbase-repl)
+
+And, you can throw yourself into the namespace if you want, like this:
+  > (in-ns 'mudphone.hbase-runner.hbase-repl) 
+
 
 While in the REPL...
 
-Either do this:
-> (require 'mudphone.hbase-runner.hbase-repl)
-> (in-ns 'mudphone.hbase-runner.hbase-repl) 
-> (list-all-tables)
+  Create a connection to HBase...
+    If you want to work with all tables:
+    > (start-hbase-repl "")
 
-Or, do this:
-> (use 'mudphone.hbase-runner.hbase-repl)
-> (list-all-tables)
+    If you would rather provide a table namespace (prefix) 
+    > (start-hbase-repl "koba_development")
+    ;; the following would force most commands to only work with tables 
+    ;; beginning with "koba_development_"
+
+  This prints all HBase tables:
+    > (list-all-tables)
+
+  This prints all HBase tables in your "namespace".
+    > (list-tables)
 
 
-To truncate tables in parallel:
-> (def result (truncate-tables list-o-tables))
-;; where "list-o-talbes" is a list of tables that you've def-ed somewhere.
+  To truncate tables in parallel:
+    > (def result (truncate-tables list-o-tables))
+    ;; where "list-o-talbes" is a list of tables that you've def-ed somewhere.
 
-If, you are in the hbase-repl namespace, you can use pretty print:
-> (pp) ;; to see the last result
-or
-> (pprint result)
+  If, you are in the hbase-repl namespace, you can use pretty print:
+    > (pp) ;; to see the last result
+    or
+    > (pprint result)
 
-I hope to make it easier to find out why things go wrong while pmap-ing the 
-table truncations.  For now, you can do this:
-> (def result (truncate-tables list-o-tables))
-> (filter-errors result)
+  I hope to make it easier to find out why things go wrong while pmap-ing the 
+  table truncations.  For now, you can do this:
+    > (def result (truncate-tables list-o-tables))
+    > (filter-errors result)
 
-Truncated tables are keyed with :truncted.  If there was an error on truncation,
+Truncated tables are keyed with :trunacted.  If there was an error on truncation,
 they will be keyed with :error.  You will want to check the console output if there
 were errors.  Also, try enable/disable on the tables, as this is frequently a
 problem.
@@ -75,21 +99,31 @@ problem.
 
 Enjoy!
 
+
+TODO:
+- Make this a comprehensive replacement for the HBase shell.
+- More sensible output from truncate-tables (perhaps with pprint).
+- Complete the hydration of tables from Clojure strings.  Currently, you can
+    write HBase table schemas to flat file.  But, you can't hydrate them yet.
+    See "dump-table" for details.
+    In general, this will allow one to save the schema of a HBase database to
+    a flat-file.
+
+
 >><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
 
 Thanks go to:
 
-  Amit Rathore - Much code was taken from his clojure util libraries.
+  Amit Rathore (@amitrathore) - Much code was taken from his clojure util libraries.
   Clojure Contrib Authors - I borrowed and stole much.
 
   For keeping our HBase up and getting us up to the required number of nodes:
     Siva Jagadeesan (@sivajag)
     Robert J. Berger (@rberger)
 
-
-HBase Team:
-  For tons of help on IRC and otherwise:
-    Michael Stack (@St^Ack)
-    Ryan Rawson (@dj_ryan / @ryanobjc) 
+  HBase Team:
+    For tons of help on IRC and otherwise:
+      Michael Stack (@St^Ack)
+      Ryan Rawson (@dj_ryan / @ryanobjc) 
 
   And, everyone else working on HBase.  Thanks!!!

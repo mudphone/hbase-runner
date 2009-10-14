@@ -13,7 +13,7 @@
   (reset! *current-table-ns* current-ns))
 (defn current-table-ns []
   (let [current-ns @*current-table-ns*]
-    (if-not (empty? current-ns)
+    (if-not (nil? current-ns)
       current-ns
       *default-table-ns*)))
 
