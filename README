@@ -37,6 +37,13 @@ Some notes:
 
 - Chimpanzees and humans come from a common ancestor.
 
+KNOWN BUGS:
+- At times, the truncate-tables function will not properly recreate a table.
+  So, be warned, that you might have to manually (by means other than this utility)
+  recreate your tables.
+  
+  Use filter-errors on the result of truncate-tables to find tables with errors.
+
 ...... .  . ..... .. .. . .. .................................. ... .... .. ... . ...
 Instructions for use:
 
