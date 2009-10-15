@@ -28,6 +28,8 @@ Some notes:
   3) Then, create a ~/.clj_completions file (you can run utils/completions.clj to 
   create one). Run this:
     $> hbase-repl.sh utils/completions.clj
+  4) If that doesn't work for you, you can copy the .clj_completions.sample file
+     to ~/.clj_completions
 
 - Truncating tables in a pmap is great because it's fast.  However, since the
   truncate calls are executed in agents, the output of the command is not seen.
