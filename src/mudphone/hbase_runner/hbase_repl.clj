@@ -86,11 +86,16 @@
      (.printStackTrace e)
      {:error table-name})))
 
+(defn extract-table-name [table-map]
+  (first (vals table-map)))
+
 (defn filter-truncated [results]
-  (filter #(= :truncated (key (first %))) results))
+  (let [table-maps (filter #(= :truncated (key (first %))) results)]
+    (map extract-table-name table-maps)))
 
 (defn filter-errors [results]
-  (filter #(= :error (key (first %))) results))
+  (let [table-maps (filter #(= :error (key (first %))) results)]
+    (map extract-table-name table-maps)))
 
 (defn display-truncation-for [result]
   (let [tables-truncated (filter-truncated result)
@@ -112,4 +117,3 @@
   (let [file (str *output-dir* "/tables.clj")
         table-map (table-map-for table-name)]
     (spit file table-map)))
-
