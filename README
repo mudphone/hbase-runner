@@ -8,7 +8,7 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 ---------------------- -- -- -- - - ---- -- - -- -- --- -- - -- --- - - -- -- - - - -
 
 What's new:
-- Now using HBase 0.20.1 for active development.
+- Now using HBase 0.20.0 for active development.
 
 Some notes:
 - The HBase jars must be on your classpath (including Zookeeper).  They are currently 
