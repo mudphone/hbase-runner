@@ -7,8 +7,11 @@ shared shared shared, shared nothing
 Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 ---------------------- -- -- -- - - ---- -- - -- -- --- -- - -- --- - - -- -- - - - -
 
+What's new:
+- Now using HBase 0.20.1 for active development.
+
 Some notes:
-- This currently works with HBase 0.20.0 and as such the HBase 0.20.0 jar must be on 
+- This currently works with HBase 0.20.1 and as such the HBase 0.20.1 jar must be on 
   your classpath.  It is currently included in lib/java and is put on the REPL
   classpath, if you use the included hbase-repl.sh script.
 

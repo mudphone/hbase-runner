@@ -92,13 +92,20 @@
 (defn filter-errors [results]
   (filter #(= :error (key (first %))) results))
 
+(defn display-truncation-for [result]
+  (let [tables-truncated (filter-truncated result)
+        tables-with-errors (filter-errors result)]
+    (println "Total tables operated on:" (count result))
+    (println "Tables truncated successfully:" (count tables-truncated))
+    (pprint tables-truncated)
+    (println "Tables with errors:" (count tables-with-errors))
+    (pprint tables-with-errors))
+  )
+
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")
   (let [result (doall (pmap truncate-table table-name-list))]
-    (println "Tables truncated successfully:")
-    (pprint (filter-truncated result))
-    (println "Tables with errors:")
-    (pprint (filter-errors result))
+    (display-truncation-for result)
     result))
 
 (defn dump-table [table-name]
