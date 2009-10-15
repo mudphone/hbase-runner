@@ -86,14 +86,20 @@
      (.printStackTrace e)
      {:error table-name})))
 
-(defn truncate-tables [table-name-list]
-  (println "Truncating" (count table-name-list) "tables ...")
-  (let [result (doall (pmap truncate-table table-name-list))]
-    result
-    ))
+(defn filter-truncated [results]
+  (filter #(= :truncated (key (first %))) results))
 
 (defn filter-errors [results]
   (filter #(= :error (key (first %))) results))
+
+(defn truncate-tables [table-name-list]
+  (println "Truncating" (count table-name-list) "tables ...")
+  (let [result (doall (pmap truncate-table table-name-list))]
+    (println "Tables truncated successfully:")
+    (pprint (filter-truncated result))
+    (println "Tables with errors:")
+    (pprint (filter-errors result))
+    result))
 
 (defn dump-table [table-name]
   (let [file (str *output-dir* "/tables.clj")

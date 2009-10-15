@@ -4,7 +4,7 @@
   (not (nil? (re-find (re-pattern (str "^" table-ns)) table-name))))
 
 (defn table-name-from [htable-descriptor]
-  (String. (.getName htable-descriptor)))
+  (.getNameAsString htable-descriptor))
 
 (defn filter-names-by [search-str names]
   (filter #(re-find (re-pattern search-str) %) names))
