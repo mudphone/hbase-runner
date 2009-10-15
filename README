@@ -143,7 +143,7 @@ TODO:
     See "dump-table" for details.
     In general, this will allow one to save the schema of a HBase database to
     a flat-file.
-
+- Write tests that use a stand-alone HBase install.
 
 >><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
 
