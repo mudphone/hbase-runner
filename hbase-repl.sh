@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Set this to where you cloned the hbase-runner repository:
-HBASE_RUNNER_HOME="${HOME}/work/clojure/hbase-runner"
-
+if [ -z "${HBASE_RUNNER_HOME}" ]; then
+  HBASE_RUNNER_HOME="${HOME}/work/clojure/hbase-runner"
+fi
 
 # You can probably leave the rest alone:
 CLOJURE_DIR="${HBASE_RUNNER_HOME}/lib/java"
@@ -14,16 +15,16 @@ if [ ! -z "${HBR_XCP}" ]; then
   CP="${CP}:${HBR_XCP}"
 fi
 
+# REPL initialization
+REPL_INIT="-i ${HBASE_RUNNER_HOME}/init.clj"
+
 # If script given, run it:
 if [ ! -z "$1" ]; then 
   scriptname=$1
   echo "Running script: ${scriptname}"
-  java -cp ${CP} clojure.main $scriptname -- $*
+  java -cp ${CP} clojure.main ${REPL_INIT} $scriptname -- $*
   exit
 fi
-
-# REPL initialization
-REPL_INIT="-i ${HBASE_RUNNER_HOME}/init.clj"
 
 # For rlwrap
 RLWRAP_PATH=`which rlwrap`
