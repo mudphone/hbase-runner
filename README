@@ -12,8 +12,9 @@ What's new:
 
 Some notes:
 - The HBase jars must be on your classpath (including Zookeeper).  They are currently 
-  included in lib/java and is put on the REPL classpath, if you use the included 
-  hbase-repl.sh script.
+  included in lib/java and are put on the REPL classpath (if you use the included 
+  hbase-repl.sh script).  If you do not use the hbase-repl.sh script, you have to
+  add these jars to your classpath manually (or however you normally do it).
 
 - While we're on the subject of the classpath, you must have the hbase-site.xml file
   for your HBase set-up in the classpath.  This is how you'll connect to ZK.  I
