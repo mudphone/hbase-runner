@@ -41,6 +41,9 @@ Some notes:
   either :truncated or :error.  There is one map per truncated table.  This return
   structure allows you to see if everything ran as expected.
 
+- There's a test suite.  But, it's not comprehensive yet.  To run it, do this:
+    $> ./hbase-repl.sh utils/spec_suite.clj
+
 - Chimpanzees and humans come from a common ancestor.
 
 
@@ -148,7 +151,7 @@ TODO:
     See "dump-table" for details.
     In general, this will allow one to save the schema of a HBase database to
     a flat-file.
-- Write tests that use a stand-alone HBase install.
+- Complete test coverage of full public API.
 
 >><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
 

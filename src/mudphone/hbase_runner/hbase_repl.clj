@@ -121,3 +121,6 @@
   (let [file (str *output-dir* "/tables.clj")
         table-map (table-map-for table-name)]
     (spit file table-map)))
+
+(defn table-exists? [table-name]
+  (not (nil? (some #(= table-name %) (list-all-tables)))))
