@@ -13,7 +13,9 @@
   (let [table-name "hbr_spec_t1"]
     (create-table-if-does-not-exist table-name)
     (is (table-enabled? table-name))
+    
     (disable-table table-name)
     (is (table-disabled? table-name))
+    
     (enable-table table-name)
     (is (table-enabled? table-name))))
