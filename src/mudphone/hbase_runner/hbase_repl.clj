@@ -73,6 +73,10 @@
   (println "Disabling table" table-name "...")
   (.disableTable *HBaseAdmin* table-name))
 
+(defn enable-table [table-name]
+  (println "Enabling table" table-name "...")
+  (.enableTable *HBaseAdmin* table-name))
+
 (defn truncate-table [table-name]
   (println "Truncating table" table-name "...")
   (try
