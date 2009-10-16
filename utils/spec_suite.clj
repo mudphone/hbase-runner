@@ -1,5 +1,5 @@
-(ns mudphone.hbase-runner-spec)
-(use 'mudphone.hbase-runner.hbase-repl)
+(ns mudphone.hbase-runner-spec
+  (:use mudphone.hbase-runner.hbase-repl))
 
 (start-hbase-repl "hbr_spec")
 
