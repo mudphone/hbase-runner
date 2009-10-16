@@ -56,9 +56,7 @@ KNOWN BUGS:
 Instructions for use:
 
 To get a REPL, you can use the hbase-repl.sh script:
-  1) Open hbase.repl.sh and update the HBASE_RUNNER_HOME environment variable.
-     It should be the directory that you just cloned from GitHub.
-  2) Run it:
+  Run the included repl script:
     $> ${HBASE_RUNNER_HOME}/hbase-repl.sh
 
   Note: Since hbase-repl.sh uses rlwrap, if you have it installed, you will get
@@ -120,6 +118,7 @@ current-table-ns []
 disable-table [table-name]
 drop-table [table-name]
 dump-table [table-name]
+enable-table [table-name]
 filter-errors [results]
 find-all-tables [search-str]
 find-tables [search-str]
