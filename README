@@ -7,6 +7,23 @@ shared shared shared, shared nothing
 Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 ---------------------- -- -- -- - - ---- -- - -- -- --- -- - -- --- - - -- -- - - - -
 
+QUICK START:
+- - - - - -
+1) clone the repo
+2) execute this command from the repo root:
+     $ HBR_XCP=<path to your hbase-site.xml dir> ./hbase-repl.sh
+3) connect with this command:
+     user=> (start-hbase-repl)
+4) do stuff, like list all tables:
+     user=> (list-all-tables)
+5) see below for comprehensive set-up instructions...
+6) explore!
+
+
+PROJECT GOALS:
+- Make this a comprehensive replacement for the HBase Shell.
+- Allow non-lisp programmers to use this tool with ease.
+
 What's new:
 - Now using HBase 0.20.0 for active development.
 
@@ -72,44 +89,44 @@ To get a REPL, you can use the hbase-repl.sh script:
 
 If you're using Emacs, and you're working with Slime, you can include the library
 like this:
-  > (require 'mudphone.hbase-runner.hbase-repl)
+  user=> (require 'mudphone.hbase-runner.hbase-repl)
 
 And, you can throw yourself into the namespace if you want, like this:
-  > (in-ns 'mudphone.hbase-runner.hbase-repl) 
+  user=> (in-ns 'mudphone.hbase-runner.hbase-repl) 
 
 
 While in the REPL...
 
   Create a connection to HBase...
     If you want to work with all tables:
-    > (start-hbase-repl "")
+    user=> (start-hbase-repl "")
 
     If you would rather provide a table namespace (prefix) 
-    > (start-hbase-repl "koba_development")
+    user=> (start-hbase-repl "koba_development")
     ;; the following would force most commands to only work with tables 
     ;; beginning with "koba_development_"
 
   This prints all HBase tables:
-    > (list-all-tables)
+    user=> (list-all-tables)
 
   This prints all HBase tables in your "namespace".
-    > (list-tables)
+    user=> (list-tables)
 
 
   To truncate tables in parallel:
-    > (def result (truncate-tables list-o-tables))
+    user=> (def result (truncate-tables list-o-tables))
     ;; where "list-o-talbes" is a list of tables that you've def-ed somewhere.
 
   If, you are in the hbase-repl namespace, you can use pretty print:
-    > (pp) ;; to see the last result
+    user=> (pp) ;; to see the last result
     or
-    > (pprint result)
+    user=> (pprint result)
 
   I hope to make it easier to find out why things go wrong while pmap-ing the 
   table truncations.  For now, you can do this:
-    > (def result (truncate-tables list-o-tables))
-    > (:errors result)    ;; => to see tables with errors
-    > (:truncated result) ;; => to see tables which were truncated
+    user=> (def result (truncate-tables list-o-tables))
+    user=> (:errors result)    ;; => to see tables with errors
+    user=> (:truncated result) ;; => to see tables which were truncated
 
 Truncated tables are keyed with :trunacted.  If there was an error on truncation,
 they will be keyed with :error.  You will want to check the console output if there
@@ -146,15 +163,14 @@ Enjoy!
 
 TODO:
 - Make this a comprehensive replacement for the HBase shell.
-- More sensible output from truncate-tables (perhaps with pprint).
 - Complete the hydration of tables from Clojure strings.  Currently, you can
     write HBase table schemas to flat file.  But, you can't hydrate them yet.
     See "dump-table" for details.
     In general, this will allow one to save the schema of a HBase database to
     a flat-file.
 - Complete test coverage of full public API.
-- Add table backup feature which will store table descriptors in a hash.
-- Add table descriptors to result of truncate tables, in case they're needed later.
+- Allow specification of HBase master via config file (or something like that)
+    rather than force use of hbase-site.xml on classpath via HBR_XCP env var.
 
 >><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
 
