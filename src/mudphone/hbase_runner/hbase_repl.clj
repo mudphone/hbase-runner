@@ -85,37 +85,31 @@
      (drop-table table-name)
      (println "Recreating table" table-name "...")
      (create-table-from *HBaseAdmin* descriptor)
-     {:truncated table-name})
+     {:status :truncated :name table-name})
    (catch Exception e
      (.printStackTrace e)
-     {:error table-name})))
-
-(defn extract-table-name [table-map]
-  (first (vals table-map)))
+     {:status :error :name table-name})))
 
 (defn filter-truncated [results]
-  (let [table-maps (filter #(= :truncated (key (first %))) results)]
-    (map extract-table-name table-maps)))
+  (filter #(= :truncated (:status %)) results))
 
 (defn filter-errors [results]
-  (let [table-maps (filter #(= :error (key (first %))) results)]
-    (map extract-table-name table-maps)))
+  (filter #(= :error (:status %)) results))
 
 (defn display-truncation-for [result]
   (let [tables-truncated (filter-truncated result)
         tables-with-errors (filter-errors result)]
     (println "Total tables operated on:" (count result))
     (println "Tables truncated successfully:" (count tables-truncated))
-    (pprint tables-truncated)
+    (pprint (map :name tables-truncated))
     (println "Tables with errors:" (count tables-with-errors))
-    (pprint tables-with-errors))
-  )
+    (pprint (map :name tables-with-errors))))
 
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")
   (let [result (doall (pmap truncate-table table-name-list))]
     (display-truncation-for result)
-    result))
+    {:errors (filter-errors result) :truncated (filter-truncated result) :all result}))
 
 (defn dump-table [table-name]
   (let [file (str *output-dir* "/tables.clj")

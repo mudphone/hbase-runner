@@ -108,7 +108,8 @@ While in the REPL...
   I hope to make it easier to find out why things go wrong while pmap-ing the 
   table truncations.  For now, you can do this:
     > (def result (truncate-tables list-o-tables))
-    > (filter-errors result)
+    > (:errors result)    ;; => to see tables with errors
+    > (:truncated result) ;; => to see tables which were truncated
 
 Truncated tables are keyed with :trunacted.  If there was an error on truncation,
 they will be keyed with :error.  You will want to check the console output if there
