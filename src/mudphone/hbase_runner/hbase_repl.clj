@@ -109,7 +109,11 @@
   (println "Truncating" (count table-name-list) "tables ...")
   (let [result (doall (pmap truncate-table table-name-list))]
     (display-truncation-for result)
-    {:errors (filter-errors result) :truncated (filter-truncated result) :all result}))
+    {
+     :errors (filter-errors result)
+     :truncated (filter-truncated result)
+     :all result
+    }))
 
 (defn dump-table [table-name]
   (let [file (str *output-dir* "/tables.clj")
