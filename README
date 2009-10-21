@@ -152,6 +152,8 @@ TODO:
     In general, this will allow one to save the schema of a HBase database to
     a flat-file.
 - Complete test coverage of full public API.
+- Add table backup feature which will store table descriptors in a hash.
+- Add table descriptors to result of truncate tables, in case they're needed later.
 
 >><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
 
