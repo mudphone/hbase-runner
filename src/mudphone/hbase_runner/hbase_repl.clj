@@ -4,6 +4,7 @@
   (:use mudphone.hbase-runner.utils.file)
   (:use mudphone.hbase-runner.utils.find)
   (:use mudphone.hbase-runner.utils.create)
+  (:use mudphone.hbase-runner.utils.truncate)
   (:use clojure.contrib.pprint))
 
 (def *default-table-ns* "koba_development")
@@ -77,6 +78,9 @@
   (println "Enabling table" table-name "...")
   (.enableTable *HBaseAdmin* table-name))
 
+(defn create-table-from [descriptor]
+  (.createTable *HBaseAdmin* descriptor))
+
 (defn truncate-table [table-name]
   (println "Truncating table" table-name "...")
   (let [descriptor (.getTableDescriptor (HTable. table-name))
@@ -85,26 +89,11 @@
      (disable-table table-name)
      (drop-table table-name)
      (println "Recreating table" table-name "...")
-     (create-table-from *HBaseAdmin* descriptor)
+     (create-table-from descriptor)
      (assoc result :status :truncated)
      (catch Exception e
        (.printStackTrace e)
        (assoc result :status :error)))))
-
-(defn filter-truncated [results]
-  (filter #(= :truncated (:status %)) results))
-
-(defn filter-errors [results]
-  (filter #(= :error (:status %)) results))
-
-(defn display-truncation-for [result]
-  (let [tables-truncated (filter-truncated result)
-        tables-with-errors (filter-errors result)]
-    (println "Total tables operated on:" (count result))
-    (println "Tables truncated successfully:" (count tables-truncated))
-    (pprint (map :name tables-truncated))
-    (println "Tables with errors:" (count tables-with-errors))
-    (pprint (map :name tables-with-errors))))
 
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")

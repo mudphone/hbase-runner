@@ -5,9 +5,6 @@
 
 (def *output-dir* "/Users/koba/work/clojure/hbase-runner/output")
 
-(defn create-table-from [hbase-admin descriptor]
-  (.createTable hbase-admin descriptor))
-
 (defn- table-descriptor-for [table-name]
   (.getTableDescriptor (HTable. table-name)))
 

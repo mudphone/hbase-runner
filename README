@@ -118,12 +118,12 @@ problem.
 
 The current public API includes:
 
+create-table-from [descriptor]
 current-table-ns []
 disable-table [table-name]
 drop-table [table-name]
 dump-table [table-name]
 enable-table [table-name]
-filter-errors [results]
 find-all-tables [search-str]
 find-tables [search-str]
 flush-table [table-name]
