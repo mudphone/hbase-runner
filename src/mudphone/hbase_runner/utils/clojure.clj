@@ -6,6 +6,7 @@
 
 (defmacro def-timed-fn [fname args & body]
   `(defn ~fname ~args
-     (let [start-time# (System/nanoTime)]
-       (do ~@body)
-       (println "Call to" ~fname "with" ~args "took" (- (System/nanoTime) start-time#) "nanoseconds"))))
+     (let [start-time# (System/nanoTime)
+           result# (do ~@body)]
+       (println "Call to" ~fname "with" ~args "took" (- (System/nanoTime) start-time#) "nanoseconds")
+       result#)))
