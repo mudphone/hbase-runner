@@ -82,20 +82,6 @@
 (defn create-table-from [descriptor]
   (.createTable *HBaseAdmin* descriptor))
 
-;; (defn truncate-table [table-name]
-;;   (println "Truncating table" table-name "...")
-;;   (let [descriptor (.getTableDescriptor (HTable. table-name))
-;;         result {:name table-name :descriptor descriptor}]
-;;     (try
-;;      (disable-table table-name)
-;;      (drop-table table-name)
-;;      (println "Recreating table" table-name "...")
-;;      (create-table-from descriptor)
-;;      (assoc result :status :truncated)
-;;      (catch Exception e
-;;        (.printStackTrace e)
-;;        (assoc result :status :error)))))
-
 (def-timed-fn truncate-table [table-name]
   (println "Truncating table" table-name "...")
   (let [descriptor (.getTableDescriptor (HTable. table-name))
