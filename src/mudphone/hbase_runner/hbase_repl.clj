@@ -1,6 +1,7 @@
 (ns mudphone.hbase-runner.hbase-repl
   (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants HTableDescriptor])
   (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable])
+  (:use mudphone.hbase-runner.utils.clojure)
   (:use mudphone.hbase-runner.utils.file)
   (:use mudphone.hbase-runner.utils.find)
   (:use mudphone.hbase-runner.utils.create)
@@ -81,7 +82,21 @@
 (defn create-table-from [descriptor]
   (.createTable *HBaseAdmin* descriptor))
 
-(defn truncate-table [table-name]
+;; (defn truncate-table [table-name]
+;;   (println "Truncating table" table-name "...")
+;;   (let [descriptor (.getTableDescriptor (HTable. table-name))
+;;         result {:name table-name :descriptor descriptor}]
+;;     (try
+;;      (disable-table table-name)
+;;      (drop-table table-name)
+;;      (println "Recreating table" table-name "...")
+;;      (create-table-from descriptor)
+;;      (assoc result :status :truncated)
+;;      (catch Exception e
+;;        (.printStackTrace e)
+;;        (assoc result :status :error)))))
+
+(def-timed-fn truncate-table [table-name]
   (println "Truncating table" table-name "...")
   (let [descriptor (.getTableDescriptor (HTable. table-name))
         result {:name table-name :descriptor descriptor}]
