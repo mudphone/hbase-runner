@@ -1,5 +1,5 @@
 {
- :localhost
+ :default
  {
   :hbase.client.retries.number 5
   :ipc.client.connect.max.retries 3

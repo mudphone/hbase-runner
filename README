@@ -2,8 +2,6 @@ This is the beginnings of a tiny utility library for working with HBase in the R
 
 Do not feed the bears.
 
-shared shared shared, shared nothing
-
 Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 ---------------------- -- -- -- - - ---- -- - -- -- --- -- - -- --- - - -- -- - - - -
 
@@ -23,6 +21,8 @@ QUICK START:
 PROJECT GOALS:
 - Make this a comprehensive replacement for the HBase Shell.
 - Allow non-lisp programmers to use this tool with ease.
+- Allow ease of exploration of HBase data values and location.
+
 
 What's new:
 - Now using HBase 0.20.0 for active development.
@@ -171,6 +171,7 @@ TODO:
 - Complete test coverage of full public API.
 - Allow specification of HBase master via config file (or something like that)
     rather than force use of hbase-site.xml on classpath via HBR_XCP env var.
+- Remove hard-coded (ooops) output / input file paths for configuration files.
 
 >><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
 

@@ -3,7 +3,7 @@
   (:use mudphone.hbase-runner.utils.clojure)
   (:use mudphone.hbase-runner.utils.file))
 
-(def *output-dir* "/Users/koba/work/clojure/hbase-runner/output")
+(def *output-dir* (str *hbase-runner-home* "/output"))
 
 (defn- table-descriptor-for [table-name]
   (.getTableDescriptor (HTable. table-name)))
@@ -33,6 +33,3 @@
                                                                             
 (defn dump-tables-to-ruby [table-names]
   (map dump-table-to-ruby table-names))
-
-(defn hydrate-table-maps-from [file]
-  (map read-clojure-str (lines-of-file file)))

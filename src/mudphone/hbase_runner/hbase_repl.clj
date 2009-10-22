@@ -1,4 +1,5 @@
 (ns mudphone.hbase-runner.hbase-repl
+  (:import [java.io File])
   (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants HTableDescriptor])
   (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable])
   (:use mudphone.hbase-runner.utils.clojure)
@@ -20,16 +21,25 @@
       *default-table-ns*)))
 
 (declare *HBaseAdmin* *HBaseConfiguration*)
+(def *hbase-runner-home* (.get (System/getenv) "HBASE_RUNNER_HOME"))
+(def *config-dir* (str *hbase-runner-home* "/config"))
+(defn read-conn-config []
+  (load-file (str *config-dir* "/connections.clj")))
 
-(defn hbase-configuration []
-  (let [config (HBaseConfiguration.)]
-    (doto config
-      ;; (.setInt "hbase.client.retries.number" 5)
-      ;; (.setInt "ipc.client.connect.max.retires" 3)
-      (.set "hbase.master" "localhost:60000")
-      (.set "hbase.zookeeper.quorum" "localhost")
-      ;; (.setBoolean "hbase.cluster.distributed" true)
-      )))
+(defn hbase-configuration
+  ([]
+     (hbase-configuration :default))
+  ([system]
+     (let [hbase-config (HBaseConfiguration.)
+           user-configs (read-conn-config)
+           system-config (merge (:default user-configs) (system user-configs))]
+       (doto hbase-config
+         ;; (.setInt "hbase.client.retries.number" 5)
+         ;; (.setInt "ipc.client.connect.max.retires" 3)
+         (.set "hbase.master" (:hbase.master system-config))
+         (.set "hbase.zookeeper.quorum" (:hbase.zookeeper.quorum system-config))
+         ;; (.setBoolean "hbase.cluster.distributed" true)
+         ))))
 
 (defn hbase-admin []
   (HBaseAdmin. *HBaseConfiguration*))
@@ -120,7 +130,7 @@
 
 (defn hydrate-tables-from [file-name]
   (let [file (str *output-dir* "/" file-name)]
-    (hydrate-table-maps-from file)))
+    (read-clojure-lines-from file)))
 
 (defn table-exists? [table-name]
   (not (nil? (some #(= table-name %) (list-all-tables)))))

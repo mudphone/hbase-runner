@@ -3,7 +3,7 @@
 # Set this to where you cloned the hbase-runner repository:
 if [ -z "${HBASE_RUNNER_HOME}" ]; then
   ABS_PATH="$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")"
-  HBASE_RUNNER_HOME=`dirname ${ABS_PATH}`
+  export HBASE_RUNNER_HOME=`dirname ${ABS_PATH}`
 fi
 
 # You can probably leave the rest alone:
