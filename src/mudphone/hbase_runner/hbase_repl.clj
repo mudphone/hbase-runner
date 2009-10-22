@@ -111,5 +111,9 @@
         table-map (table-map-for table-name)]
     (spit file table-map)))
 
+(defn hydrate-tables-from [file-name]
+  (let [file (str *output-dir* "/" file-name)]
+    (hydrate-table-maps-from file)))
+
 (defn table-exists? [table-name]
   (not (nil? (some #(= table-name %) (list-all-tables)))))
