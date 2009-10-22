@@ -4,3 +4,4 @@
 .project
 logs/*
 output/*
+lib/java/hbase-site.xml

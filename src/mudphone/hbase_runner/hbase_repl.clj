@@ -22,7 +22,14 @@
 (declare *HBaseAdmin* *HBaseConfiguration*)
 
 (defn hbase-configuration []
-  (HBaseConfiguration.))
+  (let [config (HBaseConfiguration.)]
+    (doto config
+      ;; (.setInt "hbase.client.retries.number" 5)
+      ;; (.setInt "ipc.client.connect.max.retires" 3)
+      (.set "hbase.master" "localhost:60000")
+      (.set "hbase.zookeeper.quorum" "localhost")
+      ;; (.setBoolean "hbase.cluster.distributed" true)
+      )))
 
 (defn hbase-admin []
   (HBaseAdmin. *HBaseConfiguration*))
