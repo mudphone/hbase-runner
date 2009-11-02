@@ -22,14 +22,22 @@
              :current-table-ns ""
              })))
 
-(defmacro hbr* [key]
-  `(~key @*hbase-runner-config*))
-;; (defmacro hbr*create2 [fn-name key]
-;;   `(defn ~fn-name []
-;;      (hbr* ~key)))
-;; (defmacro hbr*create [key]
-;;   `(hbr*create2 (symbol (str "hbr*" (name ~key))) ~key))
+(defmacro hbr* [a-key]
+  `(~a-key @*hbase-runner-config*))
 
+(defn fn-to-build-defn [akey]
+  (list 'defn (symbol (str "hbr*" (name akey))) []
+        (list akey '@*hbase-runner-config*)))
+
+;; (defmacro fn-to-build-defnx [akey]
+;;   (list 'defn (symbol (str "hbr*" (name akey))) []
+;;         (list akey '@*hbase-runner-config*)))
+
+(defmacro multi-defn []
+  `(do
+     ~@(map fn-to-build-defn (keys @*hbase-runner-config*))))
+
+(multi-defn)
 
 ;; (def *default-table-ns* "koba_development")
 ;; (def *current-table-ns* (atom ""))
@@ -45,7 +53,13 @@
 
 (defn read-conn-config []
   (println "HBase Runner Home is:" (hbr* :hbase-runner-home))
-  (load-file (str (hbr* :config-dir) "/connections.clj")))
+  (let [config-file (str (hbr* :config-dir) "/connections.clj")]
+    (try
+     (load-file config-file)
+     (catch java.io.FileNotFoundException e
+       (println "Error loading system config.")
+       (println "You may need to copy template file in same directory to:" config-file)
+       (System/exit 1)))))
 
 (defn hbase-configuration
   ([]
@@ -53,15 +67,17 @@
   ([system]
      (let [hbase-config (HBaseConfiguration.)
            user-configs (read-conn-config)
-           system-config (merge (:default user-configs) (system user-configs))]
-       (println "Warning!!!:" system "config does not exist.")
-       (doto hbase-config
-         ;; (.setInt "hbase.client.retries.number" 5)
-         ;; (.setInt "ipc.client.connect.max.retires" 3)
-         (.set "hbase.master" (:hbase.master system-config))
-         (.set "hbase.zookeeper.quorum" (:hbase.zookeeper.quorum system-config))
-         ;; (.setBoolean "hbase.cluster.distributed" true)
-         ))))
+           system-config (system user-configs)]
+       (if-not system-config
+         (println "Warning!!!:" system "config does not exist.  Please fix config and retry.")
+         (let [merged-config (merge (:default user-configs) (system user-configs))]
+           (doto hbase-config
+             ;; (.setInt "hbase.client.retries.number" 5)
+             ;; (.setInt "ipc.client.connect.max.retires" 3)
+             (.set "hbase.master" (:hbase.master merged-config))
+             (.set "hbase.zookeeper.quorum" (:hbase.zookeeper.quorum merged-config))
+             ;; (.setBoolean "hbase.cluster.distributed" true)
+             ))))))
 
 (declare *HBaseAdmin* *HBaseConfiguration*)
 (defn hbase-admin []
