@@ -9,22 +9,43 @@
   (:use mudphone.hbase-runner.utils.truncate)
   (:use clojure.contrib.pprint))
 
-(def *default-table-ns* "koba_development")
-(def *current-table-ns* (atom ""))
+;; (def *config-dir* (str *hbase-runner-home* "/config"))
+;; (def *output-dir* (str *hbase-runner-home* "/output"))
+(def *hbase-runner-config*
+     (let [hbase-runner-home (or (.get (System/getenv) "HBASE_RUNNER_HOME")
+                                 (this-script-path))] 
+       (ref {
+             :hbase-runner-home hbase-runner-home
+             :config-dir (str hbase-runner-home "/config")
+             :output-dir (str hbase-runner-home "/output")
+             :default-table-ns "koba_development"
+             :current-table-ns ""
+             })))
+
+(defmacro hbr* [key]
+  `(~key @*hbase-runner-config*))
+;; (defmacro hbr*create2 [fn-name key]
+;;   `(defn ~fn-name []
+;;      (hbr* ~key)))
+;; (defmacro hbr*create [key]
+;;   `(hbr*create2 (symbol (str "hbr*" (name ~key))) ~key))
+
+
+;; (def *default-table-ns* "koba_development")
+;; (def *current-table-ns* (atom ""))
 
 (defn set-current-table-ns [current-ns]
-  (reset! *current-table-ns* current-ns))
+  (dosync
+   (alter *hbase-runner-config* assoc :current-table-ns current-ns)))
 (defn current-table-ns []
-  (let [current-ns @*current-table-ns*]
+  (let [current-ns (hbr* :current-table-ns)]
     (if-not (nil? current-ns)
       current-ns
-      *default-table-ns*)))
+      (hbr* :default-table-ns))))
 
-(declare *HBaseAdmin* *HBaseConfiguration*)
-(def *hbase-runner-home* (.get (System/getenv) "HBASE_RUNNER_HOME"))
-(def *config-dir* (str *hbase-runner-home* "/config"))
 (defn read-conn-config []
-  (load-file (str *config-dir* "/connections.clj")))
+  (println "HBase Runner Home is:" (hbr* :hbase-runner-home))
+  (load-file (str (hbr* :config-dir) "/connections.clj")))
 
 (defn hbase-configuration
   ([]
@@ -41,6 +62,7 @@
          ;; (.setBoolean "hbase.cluster.distributed" true)
          ))))
 
+(declare *HBaseAdmin* *HBaseConfiguration*)
 (defn hbase-admin []
   (HBaseAdmin. *HBaseConfiguration*))
 
@@ -124,12 +146,12 @@
     }))
 
 (defn dump-table [table-name]
-  (let [file (str *output-dir* "/tables.clj")
+  (let [file (str (hbr* :output-dir) "/tables.clj")
         table-map (table-map-for table-name)]
     (spit file table-map)))
 
 (defn hydrate-tables-from [file-name]
-  (let [file (str *output-dir* "/" file-name)]
+  (let [file (str (hbr* :output-dir) "/" file-name)]
     (read-clojure-lines-from file)))
 
 (defn table-exists? [table-name]

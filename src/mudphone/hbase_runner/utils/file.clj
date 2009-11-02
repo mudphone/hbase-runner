@@ -23,3 +23,7 @@
 
 (defn read-clojure-lines-from [file]
   (map read-clojure-str (lines-of-file file)))
+
+(defn this-script-path []
+  (let [sf (File. *file*)]
+    (.substring (.getPath sf) 0 (.indexOf (.getPath sf) (.getName sf)))))

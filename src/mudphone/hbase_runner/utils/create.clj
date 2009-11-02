@@ -3,8 +3,6 @@
   (:use mudphone.hbase-runner.utils.clojure)
   (:use mudphone.hbase-runner.utils.file))
 
-(def *output-dir* (str *hbase-runner-home* "/output"))
-
 (defn- table-descriptor-for [table-name]
   (.getTableDescriptor (HTable. table-name)))
 
@@ -27,9 +25,9 @@
         family-maps (map #(family-map-from-hcolumn-descriptor %) hcolumn-descriptors )]
     (assoc table-map :families (into-array family-maps))))
 
-(defn dump-table-to-ruby [table-name]
-  (let [file (str *output-dir* "/tables.rb")]
+(defn dump-table-to-ruby [output-dir table-name]
+  (let [file (str output-dir "/tables.rb")]
     (spit file (str (table-descriptor-for table-name)))))
                                                                             
-(defn dump-tables-to-ruby [table-names]
-  (map dump-table-to-ruby table-names))
+(defn dump-tables-to-ruby [output-dir table-names]
+  (map #(dump-table-to-ruby output-dir %) table-names))
