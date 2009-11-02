@@ -54,6 +54,7 @@
      (let [hbase-config (HBaseConfiguration.)
            user-configs (read-conn-config)
            system-config (merge (:default user-configs) (system user-configs))]
+       (println "Warning!!!:" system "config does not exist.")
        (doto hbase-config
          ;; (.setInt "hbase.client.retries.number" 5)
          ;; (.setInt "ipc.client.connect.max.retires" 3)
@@ -67,12 +68,14 @@
   (HBaseAdmin. *HBaseConfiguration*))
 
 (defn start-hbase-repl
-  ([]
-     (def *HBaseConfiguration* (hbase-configuration))
+  ([system]
+     (def *HBaseConfiguration* (hbase-configuration system))
      (def *HBaseAdmin* (hbase-admin)))
-  ([table-ns]
+  ([]
+     (start-hbase-repl :default))
+  ([system table-ns]
      (set-current-table-ns table-ns)
-     (start-hbase-repl)))
+     (start-hbase-repl system)))
 
 (defn list-all-tables []
   (let [htable-descriptors (.listTables *HBaseAdmin*)]
