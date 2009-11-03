@@ -8,7 +8,7 @@
              :hbase-runner-home hbase-runner-home
              :config-dir (str hbase-runner-home "/config")
              :output-dir (str hbase-runner-home "/output")
-             :default-table-ns "koba_development"
+             :default-table-ns ""
              :current-table-ns nil
              :system nil
              })))

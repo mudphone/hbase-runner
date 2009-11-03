@@ -9,7 +9,7 @@ QUICK START:
 - - - - - -
 1) clone the repo
 2) execute this command from the repo root:
-     $ HBR_XCP=<path to your hbase-site.xml dir> ./hbase-repl.sh
+     $ ./hbase-repl.sh
 3) connect with this command:
      user=> (start-hbase-repl)
 4) do stuff, like list all tables:
@@ -26,21 +26,20 @@ PROJECT GOALS:
 
 What's new:
 - Now using HBase 0.20.0 for active development.
+    NOTE: You can use this with 0.20.1, you just have to replace the hbase and zk
+          jars in lib/java with the 0.20.1 versions.  It's that simple.
+          I hope to move to 0.20.1 for development soon.
+
+- Connections to HBase are now configured via the config/connections.clj file.
+  This is basically a Clojure map with connection settings.  This means that 
+  hbase-site.xml is no longer required for hbase-runner to find your master.
+
 
 Some notes:
 - The HBase jars must be on your classpath (including Zookeeper).  They are currently 
   included in lib/java and are put on the REPL classpath (if you use the included 
   hbase-repl.sh script).  If you do not use the hbase-repl.sh script, you have to
   add these jars to your classpath manually (or however you normally do it).
-
-- While we're on the subject of the classpath, you must have the hbase-site.xml file
-  for your HBase set-up in the classpath.  This is how you'll connect to ZK.  I
-  think there may be other ways to do this, but I haven't thought of how to do it.
-  
-  In order to get your hbase-site.xml file on the classpath, you can also invoke the
-  hbase-repl.sh script with the HBR_XCP environment variable, pointing to the
-  directory, containing the file.
-    $> HBR_XCP=/path/to/hbase-site.xml/dir ./hbase-repl.sh
 
 - For rlwrap goodness at the REPL (including tab-completion):
   1) make sure you have rlwrap installed (you can get it from macports if you're a 
@@ -66,18 +65,35 @@ Some notes:
 
 KNOWN BUGS:
 - At times, the truncate-tables function will not properly recreate a table.
-  So, be warned, that you might have to manually (by means other than this utility)
-  recreate your tables.
+  Be sure to save the result of your truncate-table(s) calls, like so:
+    $> (def result (truncate-tables list-o-tables))
+  "result" will now contain a helpful map of the tables and their statuses.
+  If there was error, you can enable/disable, or use the included HTable descriptor
+  to re-create the table.
   
-  Use filter-errors on the result of truncate-tables to find tables with errors.
+  Use (:errors result) on the result of truncate-tables to find tables with errors.
 
 
 ...... .  . ..... .. .. . .. .................................. ... .... .. ... . ...
 Instructions for use:
 
+= Setup  
+While not strictly required, it is generally a good idea to set up the 
+  HBASE_RUNNER_HOME environment variable.  Set this to where you cloned this project.
+    $> export HBASE_RUNNER_HOME=<some/path>
+    $> cd $HBASE_RUNNER_HOME
+
+Configure your HBase connection by copying config/connections.template.clj to 
+  config/connections.clj and edit this file to reflect your HBase set-up.
+    $> cd config
+    $> cp connections.template.clj connections.clj
+    $> emacs connections.clj
+  
+= Via Script
 To get a REPL, you can use the hbase-repl.sh script:
+
   Run the included repl script:
-    $> ${HBASE_RUNNER_HOME}/hbase-repl.sh
+    $> ./hbase-repl.sh
 
   Note: Since hbase-repl.sh uses rlwrap, if you have it installed, you will get
   Clojure and HBase-Runner tab-completion!
@@ -87,6 +103,8 @@ To get a REPL, you can use the hbase-repl.sh script:
   Users of the hbase-repl.sh script, do not have to explicity "use" the library
   because it is automatically loaded by the script.
 
+
+= Via Emacs
 If you're using Emacs, and you're working with Slime, you can include the library
 like this:
   user=> (require 'mudphone.hbase-runner.hbase-repl)
@@ -95,11 +113,12 @@ And, you can throw yourself into the namespace if you want, like this:
   user=> (in-ns 'mudphone.hbase-runner.hbase-repl) 
 
 
+= In General
 While in the REPL...
 
   Create a connection to HBase...
     If you want to work with all tables:
-    user=> (start-hbase-repl "")
+    user=> (start-hbase-repl)
 
     If you would rather provide a table namespace (prefix) 
     user=> (start-hbase-repl "koba_development")
@@ -112,6 +131,8 @@ While in the REPL...
   This prints all HBase tables in your "namespace".
     user=> (list-tables)
 
+  Print system settings, such as table-ns, selected system, and HBASE_RUNNER_HOME:
+    user=> (print-current-settings)
 
   To truncate tables in parallel:
     user=> (def result (truncate-tables list-o-tables))
@@ -133,6 +154,16 @@ they will be keyed with :error.  You will want to check the console output if th
 were errors.  Also, try enable/disable on the tables, as this is frequently a
 problem.
 
+The result from a truncate-table(s) call contains the original HTable descriptor.
+To retrieve a table which has been dropped in error, you can use this descriptor with
+the create-table-from function.
+
+To re-create the first table with an error (assuming it was dropped):
+  user=> (def result (truncate-tables list-o-tables))  ;; This is where things went wrong.
+  ... output with errors ...
+  user=> (create-table-from (:descriptor (first (:errors result))))
+
+
 The current public API includes:
 
 create-table-from [descriptor]
@@ -145,15 +176,15 @@ find-all-tables [search-str]
 find-tables [search-str]
 flush-table [table-name]
 flush-table-or-region [table-name-or-region-name]
-hbase-admin []
-hbase-configuration []
 list-all-tables []
 list-tables []
 major-compact [table-name-or-region-name]
+print-current-settings []
 set-current-table-ns [current-ns]
 start-hbase-repl
 table-disabled? [table-name]
 table-enabled? [table-name]
+table-exists? [table-name]
 truncate-table [table-name]
 truncate-tables [table-name-list]
 
@@ -169,8 +200,6 @@ TODO:
     In general, this will allow one to save the schema of a HBase database to
     a flat-file.
 - Complete test coverage of full public API.
-- Allow specification of HBase master via config file (or something like that)
-    rather than force use of hbase-site.xml on classpath via HBR_XCP env var.
 - Remove hard-coded (ooops) output / input file paths for configuration files.
 
 >><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<

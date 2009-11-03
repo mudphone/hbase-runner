@@ -19,7 +19,7 @@
       current-ns
       (hbr*default-table-ns))))
 
-(defn read-conn-config []
+(defn- read-conn-config []
   (let [config-file (str (hbr*config-dir) "/connections.clj")]
     (try
      (load-file config-file)
@@ -28,7 +28,7 @@
        (println "You may need to copy template file in same directory to:" config-file)
        (System/exit 1)))))
 
-(defn hbase-configuration
+(defn- hbase-configuration
   ([]
      (hbase-configuration :default))
   ([system]
@@ -47,7 +47,7 @@
              ))))))
 
 (declare *HBaseAdmin* *HBaseConfiguration*)
-(defn hbase-admin []
+(defn- hbase-admin []
   (HBaseAdmin. *HBaseConfiguration*))
 
 (defn print-current-settings []
