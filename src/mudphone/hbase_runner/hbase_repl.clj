@@ -20,7 +20,6 @@
       (hbr*default-table-ns))))
 
 (defn read-conn-config []
-  (println "HBase Runner Home is:" (hbr*hbase-runner-home))
   (let [config-file (str (hbr*config-dir) "/connections.clj")]
     (try
      (load-file config-file)
@@ -51,10 +50,18 @@
 (defn hbase-admin []
   (HBaseAdmin. *HBaseConfiguration*))
 
+(defn print-current-settings []
+  (println "HBase Runner Home is:" (hbr*hbase-runner-home))
+  (println "System is:" (name (keyword (hbr*system))))
+  (println "Current table ns is:" (current-table-ns)))
+
 (defn start-hbase-repl
   ([system]
      (def *HBaseConfiguration* (hbase-configuration system))
-     (def *HBaseAdmin* (hbase-admin)))
+     (def *HBaseAdmin* (hbase-admin))
+     (dosync
+      (alter *hbase-runner-config* assoc :system system))
+     (print-current-settings))
   ([]
      (start-hbase-repl :default))
   ([system table-ns]

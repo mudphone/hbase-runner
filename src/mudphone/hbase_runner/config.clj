@@ -10,6 +10,7 @@
              :output-dir (str hbase-runner-home "/output")
              :default-table-ns "koba_development"
              :current-table-ns nil
+             :system nil
              })))
 
 (defn fn-to-build-defn [akey]
