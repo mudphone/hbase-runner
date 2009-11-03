@@ -14,14 +14,14 @@
   (dosync
    (alter *hbase-runner-config* assoc :current-table-ns current-ns)))
 (defn current-table-ns []
-  (let [current-ns (hbr* :current-table-ns)]
+  (let [current-ns (hbr*current-table-ns)]
     (if-not (nil? current-ns)
       current-ns
-      (hbr* :default-table-ns))))
+      (hbr*default-table-ns))))
 
 (defn read-conn-config []
-  (println "HBase Runner Home is:" (hbr* :hbase-runner-home))
-  (let [config-file (str (hbr* :config-dir) "/connections.clj")]
+  (println "HBase Runner Home is:" (hbr*hbase-runner-home))
+  (let [config-file (str (hbr*config-dir) "/connections.clj")]
     (try
      (load-file config-file)
      (catch java.io.FileNotFoundException e
@@ -33,12 +33,12 @@
   ([]
      (hbase-configuration :default))
   ([system]
-     (let [hbase-config (HBaseConfiguration.)
-           user-configs (read-conn-config)
+     (let [user-configs (read-conn-config)
            system-config (system user-configs)]
        (if-not system-config
          (println "Warning!!!:" system "config does not exist.  Please fix config and retry.")
-         (let [merged-config (merge (:default user-configs) (system user-configs))]
+         (let [merged-config (merge (:default user-configs) (system user-configs))
+               hbase-config (HBaseConfiguration.)]
            (doto hbase-config
              ;; (.setInt "hbase.client.retries.number" 5)
              ;; (.setInt "ipc.client.connect.max.retires" 3)
@@ -133,12 +133,12 @@
     }))
 
 (defn dump-table [table-name]
-  (let [file (str (hbr* :output-dir) "/tables.clj")
+  (let [file (str (hbr*output-dir) "/tables.clj")
         table-map (table-map-for table-name)]
     (spit file table-map)))
 
 (defn hydrate-tables-from [file-name]
-  (let [file (str (hbr* :output-dir) "/" file-name)]
+  (let [file (str (hbr*output-dir) "/" file-name)]
     (read-clojure-lines-from file)))
 
 (defn table-exists? [table-name]
