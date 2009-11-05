@@ -2,7 +2,7 @@
   (:use mudphone.hbase-runner.utils.file))
 
 (def *hbase-runner-config*
-     (let [hbase-runner-home (or (.get (System/getenv) "HBASE_RUNNER_HOME")
+     (let [hbase-runner-home (or (System/getenv "HBASE_RUNNER_HOME")
                                  (this-script-path))] 
        (ref {
              :hbase-runner-home hbase-runner-home
