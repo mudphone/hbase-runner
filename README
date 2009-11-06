@@ -78,7 +78,7 @@ KNOWN BUGS:
 Instructions for use:
 
 = Setup  
-While not strictly required, it is generally a good idea to set up the 
+If you are planning to run hbase-runner from Emacs you must set up the 
   HBASE_RUNNER_HOME environment variable.  Set this to where you cloned this project.
     $> export HBASE_RUNNER_HOME=<some/path>
     $> cd $HBASE_RUNNER_HOME
