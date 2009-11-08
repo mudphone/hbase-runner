@@ -6,4 +6,9 @@
   :hbase.master "localhost:60000"
   :hbase.zookeeper.quorum "localhost"
   }
+ :test
+ {
+  :hbase.master "localhost:60000"
+  :hbase.zookeeper.quorum "localhost"
+  }
  }
