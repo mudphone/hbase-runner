@@ -1,6 +1,6 @@
 (ns mudphone.hbase-runner.hbase-repl
   (:import [java.io File])
-  (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants HTableDescriptor])
+  (:import [org.apache.hadoop.hbase HBaseConfiguration HColumnDescriptor HConstants HTableDescriptor])
   (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable])
   (:use mudphone.hbase-runner.config.hbase-runner)
   (:use mudphone.hbase-runner.utils.clojure)
@@ -147,9 +147,33 @@
            table-map (table-map-for (HTable. *HBaseConfiguration* table-name))]
        (spit file table-map))))
 
-(defn hydrate-table-map-from [file-name]
+(defn hydrate-table-maps-from [file-name]
   (let [file (str (hbr*output-dir) "/" file-name)]
     (read-clojure-lines-from file)))
+
+(defn column-descriptor-from [family-map]
+  (println "using family-map:" family-map)
+  (HColumnDescriptor. (.getBytes (:name family-map))
+                      (:versions family-map)
+                      (:compression family-map)
+                      (:in-memory? family-map)
+                      (:block-cache-enabled? family-map)
+                      (:blocksize family-map)
+                      (:ttl family-map)
+                      (:bloom-filter? family-map)))
+
+(defn hydrate-table-from [table-map]
+  (let [column-family-maps (:families table-map)
+        column-descriptors (map column-descriptor-from column-family-maps)
+        table-descriptor (HTableDescriptor. (:name table-map))
+        add-family (fn [family]
+                     (.addFamily table-descriptor family))]
+    (dorun (map add-family column-descriptors))
+    (.createTable *HBaseAdmin* table-descriptor)))
+
+(defn hydrate-tables-from [tables-map]
+  (doseq [table-map tables-map]
+    (hydrate-table-from table-map)))
 
 (defn table-exists? [table-name]
   (not (nil? (some #(= table-name %) (list-all-tables)))))

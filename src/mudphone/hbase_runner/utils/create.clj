@@ -12,8 +12,9 @@
    :versions (.getMaxVersions hcolumn-descriptor)
    :ttl (.getTimeToLive hcolumn-descriptor)
    :blocksize (.getBlocksize hcolumn-descriptor)
-   :in-memory (.isInMemory hcolumn-descriptor)
-   :block-cache-enabled (.isBlockCacheEnabled hcolumn-descriptor)})
+   :in-memory? (.isInMemory hcolumn-descriptor)
+   :block-cache-enabled? (.isBlockCacheEnabled hcolumn-descriptor)
+   :bloom-filter? (.isBloomfilter hcolumn-descriptor)})
 
 (defn table-map-for [htable]
   (let [table-descriptor (.getTableDescriptor htable)
