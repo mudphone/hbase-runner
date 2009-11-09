@@ -1,4 +1,5 @@
 (ns mudphone.hbase-runner.spec-helper
+  (:require [clojure.contrib.java-utils :as java-utils])
   (:import [org.apache.hadoop.hbase HTableDescriptor])
   (:use mudphone.hbase-runner.hbase-repl))
 
@@ -34,3 +35,10 @@
     (do ~@body)
     (finally
      (drop-tables-if-exist ~test-tables))))
+
+(defmacro with-cleared-file [file-path & body]
+  `(try
+    (java-utils/delete-file ~file-path :silently)
+    (do ~@body)
+    (finally
+     (java-utils/delete-file ~file-path :silently))))

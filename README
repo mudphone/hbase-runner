@@ -64,6 +64,9 @@ Some notes:
 
   B) Running tests from the Emacs REPL:
     - Start slime.
+    - open the spec file you want to run
+    - eval buffer
+        EMACS: slime-eval-buffer (or C-z on my set-up)
     - enter the spec's namespace:
         user> (in-ns 'mudphone.hbase-runner-spec)
     - connect to the test DB:
