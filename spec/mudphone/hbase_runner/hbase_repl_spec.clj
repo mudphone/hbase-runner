@@ -40,12 +40,12 @@
        (is (some #{in-ns-table-name} all-tables))
        (is (some #{other-table-name} all-tables))))))
 
-(deftest dump-table-test
+(deftest dump-tables-test
   (let [test-table (ns-table-name :t1)
         test-file-name "test-tables.clj"
         test-file-path (str (hbr*output-dir) "/" test-file-name)]
     (with-test-tables [test-table]
       (with-cleared-file test-file-path
-        (dump-table test-table test-file-name)
-        (is (= "hbr_spec_t1" (:name (first (hydrate-table-map-from test-file-name))))))
+        (dump-tables [test-table] test-file-name)
+        (is (= "hbr_spec_t1" (:name (first (hydrate-table-maps-from test-file-name))))))
 )))

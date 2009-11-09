@@ -35,7 +35,9 @@
      (let [user-configs (read-conn-config)
            system-config (system user-configs)]
        (if-not system-config
-         (println "Warning!!!:" system "config does not exist.  Please fix config and retry.")
+         (do
+           (println "Warning!!!:" system "config does not exist.  Please fix config and retry.")
+           (throw (Exception. "No matching system config.")))
          (let [merged-config (merge (:default user-configs) (system user-configs))
                hbase-config (HBaseConfiguration.)]
            (doto hbase-config
@@ -139,13 +141,21 @@
      :all result
     }))
 
-(defn dump-table
-  ([table-name]
-     (dump-table table-name "tables.clj"))
-  ([table-name output-file-name]
-     (let [file (str (hbr*output-dir) "/" output-file-name)
-           table-map (table-map-for (HTable. *HBaseConfiguration* table-name))]
-       (spit file table-map))))
+(defn- spit-table-maps-for [table-names file-path]
+  (println "Dumping files to:" file-path)
+  (doseq [table-name table-names]
+    (println "  ...dumping:" table-name)
+    (let [table-map (table-map-for (HTable. *HBaseConfiguration* table-name))]
+      (spit file-path table-map))))
+
+(defn dump-tables
+  ([table-names]
+     (dump-tables table-names "tables.clj"))
+  ([table-names output-file-name]
+     (let [file-path (str (hbr*output-dir) "/" output-file-name)]
+       (if (.exists (File. file-path))
+         (println "Output file already exists:" file-path)
+         (spit-table-maps-for table-names file-path)))))
 
 (defn hydrate-table-maps-from [file-name]
   (let [file (str (hbr*output-dir) "/" file-name)]
