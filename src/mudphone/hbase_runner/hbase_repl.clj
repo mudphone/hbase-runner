@@ -46,7 +46,7 @@
              (.setBoolean "hbase.cluster.distributed"  (:hbase.cluster.distributed merged-config))
              ))))))
 
-(declare *HBaseAdmin* *HBaseConfiguration*)
+(declare *HBaseConfiguration*)
 (defn- hbase-admin []
   (HBaseAdmin. *HBaseConfiguration*))
 
@@ -147,7 +147,7 @@
            table-map (table-map-for (HTable. *HBaseConfiguration* table-name))]
        (spit file table-map))))
 
-(defn hydrate-tables-from [file-name]
+(defn hydrate-table-map-from [file-name]
   (let [file (str (hbr*output-dir) "/" file-name)]
     (read-clojure-lines-from file)))
 

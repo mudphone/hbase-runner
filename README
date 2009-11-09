@@ -58,7 +58,20 @@ Some notes:
   structure allows you to see if everything ran as expected.
 
 - There's a test suite.  But, it's not comprehensive yet.  To run it, do this:
-    $> ./hbase-repl.sh utils/spec_suite.clj
+    
+  A) Running tests from the command-line:
+    $> ./run_tests.sh
+
+  B) Running tests from the Emacs REPL:
+    - Start slime.
+    - enter the spec's namespace:
+        user> (in-ns 'mudphone.hbase-runner-spec)
+    - connect to the test DB:
+        user> (start-hbase-repl :test "hbr_spec")
+    - run all specs:
+        user> (run-tests)
+    - run a focused spec:
+        user> (dump-table-test)
 
 - Chimpanzees and humans come from a common ancestor.
 

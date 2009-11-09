@@ -1,5 +1,7 @@
 (ns mudphone.hbase-runner-spec
+  (:require [clojure.contrib.java-utils :as j-utils])
   (:use [clojure.test :only [run-tests deftest is]])
+  (:use mudphone.hbase-runner.config.hbase-runner)
   (:use mudphone.hbase-runner.spec-helper)
   (:use mudphone.hbase-runner.hbase-repl))
 
@@ -41,5 +43,9 @@
 (deftest dump-table-test
   (let [test-table (ns-table-name :t1)]
     (with-test-tables [test-table]
-      (dump-table test-table "test-tables.clj")
-      (hydrate-tables-from "test-tables.clj"))))
+      (try
+       (dump-table test-table "test-tables.clj")
+       (is "hbr_spec_t1" (:name (hydrate-table-map-from "test-tables.clj")))
+       (finally
+        (j-utils/delete-file (str (hbr*output-dir) "/test-tables.clj"))))
+      )))
