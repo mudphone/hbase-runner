@@ -1,4 +1,4 @@
-(ns mudphone.hbase-runner.config
+(ns mudphone.hbase-runner.config.hbase-runner
   (:use mudphone.hbase-runner.utils.file))
 
 (def *hbase-runner-config*

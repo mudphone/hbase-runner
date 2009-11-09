@@ -25,7 +25,7 @@
       (enable-table table-name)
       (is (table-enabled? table-name)))))
 
-(deftest list-tables-and-list-all-tables-test []
+(deftest list-tables-and-list-all-tables-test
   (let [in-ns-table-name (ns-table-name :t1)
         other-table-name "other_test_table"
         test-tables [in-ns-table-name other-table-name]]
@@ -37,3 +37,9 @@
      (let [all-tables (list-all-tables)]
        (is (some #{in-ns-table-name} all-tables))
        (is (some #{other-table-name} all-tables))))))
+
+(deftest dump-table-test
+  (let [test-table (ns-table-name :t1)]
+    (with-test-tables [test-table]
+      (dump-table test-table "test-tables.clj")
+      (hydrate-tables-from "test-tables.clj"))))

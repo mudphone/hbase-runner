@@ -2,7 +2,7 @@
   (:import [java.io File])
   (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants HTableDescriptor])
   (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable])
-  (:use mudphone.hbase-runner.config)
+  (:use mudphone.hbase-runner.config.hbase-runner)
   (:use mudphone.hbase-runner.utils.clojure)
   (:use mudphone.hbase-runner.utils.file)
   (:use mudphone.hbase-runner.utils.find)
@@ -39,11 +39,11 @@
          (let [merged-config (merge (:default user-configs) (system user-configs))
                hbase-config (HBaseConfiguration.)]
            (doto hbase-config
-             ;; (.setInt "hbase.client.retries.number" 5)
-             ;; (.setInt "ipc.client.connect.max.retires" 3)
-             (.set "hbase.master" (:hbase.master merged-config))
-             (.set "hbase.zookeeper.quorum" (:hbase.zookeeper.quorum merged-config))
-             ;; (.setBoolean "hbase.cluster.distributed" true)
+             (.setInt "hbase.client.retries.number"    (:hbase.client.retries.number merged-config))
+             (.setInt "ipc.client.connect.max.retires" (:ipc.client.connect.max.retries merged-config))
+             (.set "hbase.master"                      (:hbase.master merged-config))
+             (.set "hbase.zookeeper.quorum"            (:hbase.zookeeper.quorum merged-config))
+             (.setBoolean "hbase.cluster.distributed"  (:hbase.cluster.distributed merged-config))
              ))))))
 
 (declare *HBaseAdmin* *HBaseConfiguration*)
@@ -56,14 +56,14 @@
   (println "Current table ns is:" (current-table-ns)))
 
 (defn start-hbase-repl
+  ([]
+     (start-hbase-repl :default))
   ([system]
      (def *HBaseConfiguration* (hbase-configuration system))
      (def *HBaseAdmin* (hbase-admin))
      (dosync
       (alter *hbase-runner-config* assoc :system system))
      (print-current-settings))
-  ([]
-     (start-hbase-repl :default))
   ([system table-ns]
      (set-current-table-ns table-ns)
      (start-hbase-repl system)))
@@ -139,10 +139,13 @@
      :all result
     }))
 
-(defn dump-table [table-name]
-  (let [file (str (hbr*output-dir) "/tables.clj")
-        table-map (table-map-for table-name)]
-    (spit file table-map)))
+(defn dump-table
+  ([table-name]
+     (dump-table table-name "tables.clj"))
+  ([table-name output-file-name]
+     (let [file (str (hbr*output-dir) "/" output-file-name)
+           table-map (table-map-for (HTable. *HBaseConfiguration* table-name))]
+       (spit file table-map))))
 
 (defn hydrate-tables-from [file-name]
   (let [file (str (hbr*output-dir) "/" file-name)]

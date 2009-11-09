@@ -3,8 +3,8 @@
   (:use mudphone.hbase-runner.utils.clojure)
   (:use mudphone.hbase-runner.utils.file))
 
-(defn- table-descriptor-for [table-name]
-  (.getTableDescriptor (HTable. table-name)))
+(defn- table-descriptor-for [htable]
+  (.getTableDescriptor htable))
 
 (defn- compression-name-for [hcolumn-descriptor]
   (.getName (.getCompression hcolumn-descriptor)))
@@ -18,8 +18,8 @@
    :in-memory (.isInMemory hcolumn-descriptor)
    :block-cache-enabled (.isBlockCacheEnabled hcolumn-descriptor)})
 
-(defn table-map-for [table-name]
-  (let [table-descriptor (table-descriptor-for table-name)
+(defn table-map-for [htable]
+  (let [table-descriptor (table-descriptor-for htable)
         hcolumn-descriptors (.getFamilies table-descriptor)
         table-map {:name (.getNameAsString table-descriptor)}
         family-maps (map #(family-map-from-hcolumn-descriptor %) hcolumn-descriptors )]
