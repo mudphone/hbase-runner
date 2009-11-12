@@ -60,15 +60,23 @@
 (defn start-hbase-repl
   ([]
      (start-hbase-repl :default))
-  ([system]
+  ([system-or-table-ns]
+     (cond
+       (keyword? system-or-table-ns) (let [system system-or-table-ns]
+                                       (start-hbase-repl system (current-table-ns)))
+       (string? system-or-table-ns) (let [table-ns system-or-table-ns]
+                                      (start-hbase-repl :default system-or-table-ns))
+       :else (do
+               (println "You must provide a system name (as :keyword) or table namespace (as \"string\"), or both.")
+               (println "  System default is :default")
+               (println "  Table namespace default is blank"))))
+  ([system table-ns]
+     (set-current-table-ns table-ns)
      (def *HBaseConfiguration* (hbase-configuration system))
      (def *HBaseAdmin* (hbase-admin))
      (dosync
       (alter *hbase-runner-config* assoc :system system))
-     (print-current-settings))
-  ([system table-ns]
-     (set-current-table-ns table-ns)
-     (start-hbase-repl system)))
+     (print-current-settings)))
 
 (defn list-all-tables []
   (let [htable-descriptors (.listTables *HBaseAdmin*)]
