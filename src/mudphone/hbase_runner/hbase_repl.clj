@@ -166,7 +166,7 @@
 (defn table-exists? [table-name]
   (not (nil? (some #(= table-name %) (list-all-tables)))))
 
-(defn count [table-name]
+(defn rows-in [table-name]
   (let [htable (HTable. *HBaseConfiguration* table-name)
         start-end-byte-arrays (.getStartEndKeys htable)
         start-keys (map #(String. %) (.getFirst start-end-byte-arrays))
