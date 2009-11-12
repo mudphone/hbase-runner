@@ -2,6 +2,7 @@
   (:import [java.io File])
   (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants])
   (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable])
+  (:require [clojure.contrib [str-utils :as str-utils]])
   (:use mudphone.hbase-runner.config.hbase-runner)
   (:use mudphone.hbase-runner.utils.clojure)
   (:use mudphone.hbase-runner.utils.file)
@@ -172,4 +173,6 @@
         start-keys (map #(String. %) (.getFirst start-end-byte-arrays))
         end-keys (map #(String. %) (.getSecond start-end-byte-arrays))]
     (println "first start-key" (first start-keys))
-    (println "first end-key" (first end-keys))))
+    (println "all start-keys" (str-utils/str-join " " start-keys))
+    (println "first end-key" (first end-keys))
+    (println "all end-keys" (str-utils/str-join " " end-keys))))
