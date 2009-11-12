@@ -31,6 +31,13 @@
 (defn dump-tables-to-ruby [output-dir table-names]
   (map #(dump-table-to-ruby output-dir %) table-names))
 
+(defn spit-table-maps [the-hbase-config table-names file-path]
+  (println "Dumping files to:" file-path)
+  (doseq [table-name table-names]
+    (println "  ...dumping:" table-name)
+    (let [table-map (table-map-for (HTable. the-hbase-config table-name))]
+      (spit file-path table-map))))
+
 (defn column-descriptor-from [family-map]
   (println "using family-map:" family-map)
   (HColumnDescriptor. (.getBytes (:name family-map))

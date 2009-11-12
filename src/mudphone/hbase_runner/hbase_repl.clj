@@ -141,13 +141,6 @@
      :all result
     }))
 
-(defn- spit-table-maps-for [table-names file-path]
-  (println "Dumping files to:" file-path)
-  (doseq [table-name table-names]
-    (println "  ...dumping:" table-name)
-    (let [table-map (table-map-for (HTable. *HBaseConfiguration* table-name))]
-      (spit file-path table-map))))
-
 (defn dump-tables
   ([table-names]
      (dump-tables table-names "tables.clj"))
@@ -155,7 +148,7 @@
      (let [file-path (str (hbr*output-dir) "/" output-file-name)]
        (if (.exists (File. file-path))
          (println "Output file already exists:" file-path)
-         (spit-table-maps-for table-names file-path)))))
+         (spit-table-maps *HBaseConfiguration* table-names file-path)))))
 
 (defn hydrate-table-maps-from [file-name]
   (let [file (str (hbr*output-dir) "/" file-name)
