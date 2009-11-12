@@ -1,4 +1,5 @@
 (ns mudphone.hbase-runner.utils.create
+  (:import [org.apache.hadoop.hbase HColumnDescriptor HTableDescriptor])
   (:import [org.apache.hadoop.hbase.client HTable])
   (:use mudphone.hbase-runner.utils.clojure)
   (:use mudphone.hbase-runner.utils.file))
@@ -29,3 +30,27 @@
                                                                             
 (defn dump-tables-to-ruby [output-dir table-names]
   (map #(dump-table-to-ruby output-dir %) table-names))
+
+(defn column-descriptor-from [family-map]
+  (println "using family-map:" family-map)
+  (HColumnDescriptor. (.getBytes (:name family-map))
+                      (:versions family-map)
+                      (:compression family-map)
+                      (:in-memory? family-map)
+                      (:block-cache-enabled? family-map)
+                      (:blocksize family-map)
+                      (:ttl family-map)
+                      (:bloom-filter? family-map)))
+
+(defn hydrate-table-map [the-hbase-admin table-map]
+  (let [column-family-maps (:families table-map)
+        column-descriptors (map column-descriptor-from column-family-maps)
+        table-descriptor (HTableDescriptor. (:name table-map))
+        add-family (fn [family]
+                     (.addFamily table-descriptor family))]
+    (dorun (map add-family column-descriptors))
+    (.createTable the-hbase-admin table-descriptor)))
+
+(defn hydrate-table-maps [the-hbase-admin table-maps]
+  (doseq [table-map table-maps]
+    (hydrate-table-map the-hbase-admin table-map)))
