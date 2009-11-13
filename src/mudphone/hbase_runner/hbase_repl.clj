@@ -1,7 +1,7 @@
 (ns mudphone.hbase-runner.hbase-repl
   (:import [java.io File])
   (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants])
-  (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable])
+  (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable Scan])
   (:require [clojure.contrib [str-utils :as str-utils]])
   (:use mudphone.hbase-runner.config.hbase-runner)
   (:use mudphone.hbase-runner.utils.clojure)
@@ -167,12 +167,24 @@
 (defn table-exists? [table-name]
   (not (nil? (some #(= table-name %) (list-all-tables)))))
 
-(defn rows-in [table-name]
+(defn byte-array-to-str [byte-array]
+  (apply str (map char byte-array)))
+
+(defn count-region [htable start-key end-key]
+  (let [descriptor (.getTableDescriptor htable)
+        first-family (first (.getFamilies descriptor))
+        first-family-name (byte-array-to-str (.getNameWithColon first-family))
+        scan (Scan. (.getBytes start-key) (.getBytes end-key))
+        result-scanner (.getScanner htable scan)]
+    (count (seq result-scanner))))
+
+(defn count-rows [table-name]
   (let [htable (HTable. *HBaseConfiguration* table-name)
         start-end-byte-arrays (.getStartEndKeys htable)
-        start-keys (map #(String. %) (.getFirst start-end-byte-arrays))
-        end-keys (map #(String. %) (.getSecond start-end-byte-arrays))]
-    (println "first start-key" (first start-keys))
-    (println "all start-keys |" (str-utils/str-join "-" start-keys) "|")
-    (println "first end-key" (first end-keys))
-    (println "all end-keys |" (str-utils/str-join "-" end-keys) "|")))
+        start-keys (map byte-array-to-str (.getFirst start-end-byte-arrays))
+        end-keys (map byte-array-to-str (.getSecond start-end-byte-arrays))]
+    (println "start-keys:" (str-utils/str-join "-" start-keys))
+    (println "end-keys:" (str-utils/str-join "-" end-keys))
+    (reduce + (pmap #(count-region htable %1 %2) start-keys end-keys))
+    )
+  )
