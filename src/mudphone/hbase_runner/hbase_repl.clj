@@ -185,6 +185,7 @@
         end-keys (map byte-array-to-str (.getSecond start-end-byte-arrays))]
     (println "start-keys:" (str-utils/str-join "-" start-keys))
     (println "end-keys:" (str-utils/str-join "-" end-keys))
+    (println "total regions:" (count start-keys))
     (reduce + (pmap #(count-region htable %1 %2) start-keys end-keys))
     )
   )
