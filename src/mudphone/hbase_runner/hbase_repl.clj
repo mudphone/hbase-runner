@@ -119,6 +119,15 @@
   (println "Disabling table" table-name "...")
   (.disableTable *HBaseAdmin* table-name))
 
+(declare table-exists?)
+(defn disable-drop-table [table-name]
+  (if (table-exists? table-name)
+    (do
+      (if (table-enabled? table-name)
+        (disable-table table-name))
+      (drop-table table-name))
+    (println "Tables does not exist:" table-name "... skipping.")))
+
 (defn enable-table [table-name]
   (println "Enabling table" table-name "...")
   (.enableTable *HBaseAdmin* table-name))
