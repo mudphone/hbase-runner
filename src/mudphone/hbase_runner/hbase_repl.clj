@@ -42,11 +42,18 @@
          (let [merged-config (merge (:default user-configs) (system user-configs))
                hbase-config (HBaseConfiguration.)]
            (doto hbase-config
-             (.setInt "hbase.client.retries.number"    (:hbase.client.retries.number merged-config))
-             (.setInt "ipc.client.connect.max.retires" (:ipc.client.connect.max.retries merged-config))
-             (.set "hbase.master"                      (:hbase.master merged-config))
-             (.set "hbase.zookeeper.quorum"            (:hbase.zookeeper.quorum merged-config))
-             (.setBoolean "hbase.cluster.distributed"  (:hbase.cluster.distributed merged-config))
+             (.setInt "hbase.client.retries.number"
+                      (:hbase.client.retries.number merged-config))
+             (.setInt "ipc.client.connect.max.retires"
+                      (:ipc.client.connect.max.retries merged-config))
+             (.set    "hbase.master"
+                      (:hbase.master merged-config))
+             (.set    "hbase.zookeeper.quorum"
+                      (:hbase.zookeeper.quorum merged-config))
+             (.setBoolean "hbase.cluster.distributed"
+                          (:hbase.cluster.distributed merged-config))
+             (.set "hbase.rootdir"
+                   (:hbase.rootdir merged-config))
              ))))))
 
 (declare *HBaseConfiguration*)
