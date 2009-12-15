@@ -43,7 +43,6 @@
            (throw (Exception. "No matching system config.")))
          (let [merged-config (merge
                               (:default user-configs) (system user-configs))
-               _ (pprint merged-config)
                hbase-config (HBaseConfiguration.)]
            (doto hbase-config
              (.setInt "hbase.client.retries.number"
@@ -66,10 +65,7 @@
 
 (declare *HBaseConfiguration*)
 (defn hbase-admin []
-  (println "Before hbase-admin")
-  (pprint *HBaseConfiguration*)
-  (HBaseAdmin. *HBaseConfiguration*)
-  (println "After hbase-admin"))
+  (HBaseAdmin. *HBaseConfiguration*))
 
 (defn print-current-settings []
   (println "HBase Runner Home is:" (hbr*hbase-runner-home))
@@ -97,9 +93,7 @@
   ([system table-ns]
      (set-current-table-ns table-ns)
      (def *HBaseConfiguration* (hbase-configuration system))
-     (println "After HBaseConfig")
      (def *HBaseAdmin* (hbase-admin))
-     (println "After HBaseAdmin")
      (dosync
       (alter *hbase-runner-config* assoc :system system))
      (print-current-settings)))
