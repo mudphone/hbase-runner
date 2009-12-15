@@ -26,7 +26,8 @@
      (load-file config-file)
      (catch java.io.FileNotFoundException e
        (println "Error loading system config.")
-       (println "You may need to copy template file in same directory to:" config-file)
+       (println "You may need to copy template file in same directory to:"
+                config-file)
        (System/exit 1)))))
 
 (defn- hbase-configuration
@@ -37,9 +38,11 @@
            system-config (system user-configs)]
        (if-not system-config
          (do
-           (println "Warning!!!:" system "config does not exist.  Please fix config and retry.")
+           (println "Warning!!!:" system
+                    "config does not exist.  Please fix config and retry.")
            (throw (Exception. "No matching system config.")))
-         (let [merged-config (merge (:default user-configs) (system user-configs))
+         (let [merged-config (merge
+                              (:default user-configs) (system user-configs))
                hbase-config (HBaseConfiguration.)]
            (doto hbase-config
              (.setInt "hbase.client.retries.number"
@@ -70,14 +73,19 @@
      (start-hbase-repl :default))
   ([system-or-table-ns]
      (cond
-       (keyword? system-or-table-ns) (let [system system-or-table-ns]
-                                       (start-hbase-repl system (current-table-ns)))
-       (string? system-or-table-ns) (let [table-ns system-or-table-ns]
-                                      (start-hbase-repl :default system-or-table-ns))
-       :else (do
-               (println "You must provide a system name (as :keyword) or table namespace (as \"string\"), or both.")
-               (println "  System default is :default")
-               (println "  Table namespace default is blank"))))
+      (keyword? system-or-table-ns)
+      (let [system system-or-table-ns]
+        (start-hbase-repl system (current-table-ns)))
+
+      (string? system-or-table-ns)
+      (let [table-ns system-or-table-ns]
+        (start-hbase-repl :default system-or-table-ns))
+
+      :else (do
+              (println "You must provide a system name (as :keyword)"
+                       "or table namespace (as \"string\"), or both.")
+              (println "  System default is :default")
+              (println "  Table namespace default is blank"))))
   ([system table-ns]
      (set-current-table-ns table-ns)
      (def *HBaseConfiguration* (hbase-configuration system))
