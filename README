@@ -5,13 +5,6 @@ Do not feed the bears.
 Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 ---------------------- -- -- -- - - ---- -- - -- -- --- -- - -- --- - - -- -- - - - -
 
-OOPS:
-"truncate-table" is currently broken when running it from a remote server.
-I should be creating the table descriptor using the existing hbase-admin object.
-In the meantime, if you put a valid hbase-site.xml in your classpath, it will
-work.
-
-
 QUICK START:
 - - - - - -
 1) clone the repo
