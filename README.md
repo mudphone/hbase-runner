@@ -26,9 +26,9 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 
 # What's new:
 - Now using HBase 0.20.2 for active development.
-  NOTE: You can use this with 0.20.0-1, you just have to replace the hbase and
-  zk jars in lib/java with the proper versions.  It's that simple AFAIK.
-  YMMV.
+NOTE: You can use this with 0.20.0-1, you just have to replace the hbase and
+zk jars in lib/java with the proper versions.  It's that simple AFAIK.
+YMMV.
 
 - Connections to HBase are now configured via the config/connections.clj file.
   This is basically a Clojure map with connection settings.  This means that
