@@ -79,7 +79,9 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
      - run a focused spec:
            user> (dump-table-test)
 
-- Chimpanzees and humans come from a common ancestor.
+  3. Actually, the easiest way to run the tests is via swank-clojure-project
+     and the clojure-test minor mode.  If you have those set up, you can just
+     open a spec buffer and run C-c C-,
 
 
 # KNOWN BUGS:
