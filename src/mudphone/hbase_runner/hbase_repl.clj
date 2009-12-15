@@ -152,7 +152,7 @@
 
 (def-timed-fn truncate-table [table-name]
   (println "Truncating table" table-name "...")
-  (let [descriptor (.getTableDescriptor (HTable. table-name))
+  (let [descriptor (.getTableDescriptor *HBaseAdmin* (.getBytes table-name))
         result {:name table-name :descriptor descriptor}]
     (try
      (disable-table table-name)
