@@ -231,12 +231,13 @@ Enjoy!
              "diable-drop-table-if-exists"
              "close_region"
 - Complete test coverage of full public API.
-- Remove hard-coded (ooops) output / input file paths for configuration files.
+- Remove hard-coded (ooops) output / input file paths for table dump files.
 
 
 # Thanks go to:
 
-  Amit Rathore (#amitrathore) - Much code was taken from his clojure util libraries.
+  Amit Rathore (#amitrathore) - Much code was taken from his
+                                clojure util libraries.
   Clojure Contrib Authors - I borrowed and stole much.
 
   For keeping our HBase up and getting us up to the required number of nodes:
