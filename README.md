@@ -37,18 +37,18 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 
 
 # Some notes:
-- The HBase jars must be on your classpath (including Zookeeper).  
-  They are currently included in lib/java and are put on the REPL classpath 
-  (if you use the included hbase-repl.sh script).  
+- The HBase jars must be on your classpath (including Zookeeper).
+  They are currently included in lib/java and are put on the REPL classpath
+  (if you use the included hbase-repl.sh script).
   If you do not use the hbase-repl.sh script, you have to add these jars to your
   classpath manually (or however you normally do it).
 
 - For rlwrap goodness at the REPL (including tab-completion):
   1. make sure you have rlwrap installed (you can get it from macports if you're
-     a mac drone).  
-  2. Also, set up your ~/.inputrc file (a sample is in config/.inputrc).  
+     a mac drone).
+  2. Also, set up your ~/.inputrc file (a sample is in config/.inputrc).
   3. Then, create a ~/.clj_completions file (you can run utils/completions.clj
-     to create one). 
+     to create one).
      Run this:
          $> hbase-repl.sh utils/completions.clj
   4. If that doesn't work for you, you can copy the .clj_completions.sample file
@@ -61,7 +61,7 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
   This return structure allows you to see if everything ran as expected.
 
 - There's a test suite.  But, it's not comprehensive yet.  To run it, do this:
-    
+
   1. Running tests from the command-line:
          $> ./run_tests.sh
 
@@ -89,9 +89,9 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
   Be sure to save the result of your truncate-table(s) calls, like so:
     $> (def result (truncate-tables list-o-tables))
   "result" will now contain a helpful map of the tables and their statuses.
-  If there was error, you can enable/disable, or use the included HTable 
+  If there was error, you can enable/disable, or use the included HTable
   descriptor to re-create the table.
-  
+
   Use (:errors result) on the result of truncate-tables to find tables with
   errors.
 
@@ -100,14 +100,14 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 
 # Instructions for use:
 
-## Setup  
-If you are planning to run hbase-runner from Emacs you must set up the 
-HBASE_RUNNER_HOME environment variable.  Set this to where you cloned 
+## Setup
+If you are planning to run hbase-runner from Emacs you must set up the
+HBASE_RUNNER_HOME environment variable.  Set this to where you cloned
 this project.
     $> export HBASE_RUNNER_HOME=<some/path>
     $> cd $HBASE_RUNNER_HOME
 
-Configure your HBase connection by copying config/connections.template.clj to 
+Configure your HBase connection by copying config/connections.template.clj to
 config/connections.clj and edit this file to reflect your HBase set-up.
     $> cd config
     $> cp connections.template.clj connections.clj
@@ -124,7 +124,7 @@ To get a REPL, you can use the hbase-repl.sh script:
 
   Note: Since hbase-repl.sh uses rlwrap, if you have it installed, you will get
   Clojure and HBase-Runner tab-completion!
-    For example: 
+    For example:
         > (truncate-t<tab> ;;=> (truncate-table
     See rlwrap note above to set up your list of completions.
 
@@ -133,12 +133,12 @@ To get a REPL, you can use the hbase-repl.sh script:
 
 ### Via Emacs
 
-If you're using Emacs, and you're working with Slime, you can include the library
-like this:
+If you're using Emacs, and you're working with Slime, you can include the
+library like this:
     user=> (require 'mudphone.hbase-runner.hbase-repl)
 
 And, you can throw yourself into the namespace if you want, like this:
-    user=> (in-ns 'mudphone.hbase-runner.hbase-repl) 
+    user=> (in-ns 'mudphone.hbase-runner.hbase-repl)
 
 
 ### In General
@@ -149,9 +149,9 @@ While in the REPL...
   If you want to work with all tables:
       user=> (start-hbase-repl)
 
-  If you would rather provide a table namespace (prefix) 
+  If you would rather provide a table namespace (prefix)
       user=> (start-hbase-repl "koba_development")
-      ;; the following would force most commands to only work with tables 
+      ;; the following would force most commands to only work with tables
       ;; beginning with "koba_development_"
 
   This prints all HBase tables:
@@ -160,7 +160,7 @@ While in the REPL...
   This prints all HBase tables in your "namespace".
       user=> (list-tables)
 
-  Print system settings, such as table-ns, selected system, and 
+  Print system settings, such as table-ns, selected system, and
   HBASE_RUNNER_HOME:
       user=> (print-current-settings)
 
@@ -173,7 +173,7 @@ While in the REPL...
       or
       user=> (pprint result)
 
-  I hope to make it easier to find out why things go wrong while pmap-ing the 
+  I hope to make it easier to find out why things go wrong while pmap-ing the
   table truncations.  For now, you can do this:
       user=> (def result (truncate-tables list-o-tables))
       user=> (:errors result)    ;; => to see tables with errors
@@ -189,7 +189,7 @@ descriptor. To retrieve a table which has been dropped in error, you can use
 this descriptor with the create-table-from function.
 
 To re-create the first table with an error (assuming it was dropped):
-    user=> (def result (truncate-tables list-o-tables))  
+    user=> (def result (truncate-tables list-o-tables))
     ;; This is where things went wrong.
     ... output with errors ...
     user=> (create-table-from (:descriptor (first (:errors result))))
