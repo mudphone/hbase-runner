@@ -9,7 +9,7 @@ fi
 # You can probably leave the rest alone:
 LIB_DIR="${HBASE_RUNNER_HOME}/lib"
 CP_JARS="${LIB_DIR}/*"
-CP="${CP_JARS}:${HBASE_RUNNER_HOME}/src"
+CP="${CP_JARS}:${HBASE_RUNNER_HOME}/src:${HBASE_RUNNER_HOME}/test"
 
 # Add extra classpath, if any -- for example the location of hbase-site.xml.
 if [ ! -z "${HBR_XCP}" ]; then

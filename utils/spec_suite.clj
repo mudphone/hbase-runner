@@ -1,9 +1,9 @@
-(ns hbase-runner.hbase-repl-spec
-  (:use hbase-runner.hbase-repl))
+(ns hbase-runner.all-hbase-repl-spec
+  (:use [clojure.test :only [run-tests deftest is]])
+  (:use hbase-runner.hbase-repl)
+  (:use hbase-runner.spec-helper)
+  (:use hbase-runner.hbase-repl-spec))
 
 (start-hbase-repl :test "hbr_spec")
-
-(load-file "src/hbase_runner/spec_helper.clj")
-(load-file "test/hbase_runner/hbase_repl_spec.clj")
 
 (run-tests)
