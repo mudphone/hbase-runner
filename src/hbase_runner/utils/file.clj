@@ -1,7 +1,7 @@
-(ns mudphone.hbase-runner.utils.file
+(ns hbase-runner.utils.file
   (:import (java.io BufferedReader BufferedWriter File FileInputStream FileWriter InputStreamReader)
            (org.apache.commons.io FileUtils))
-  (:use mudphone.hbase-runner.utils.clojure)
+  (:use hbase-runner.utils.clojure)
   (:use clojure.contrib.pprint)
   (:require [clojure.contrib.str-utils2 :as su2]))
 

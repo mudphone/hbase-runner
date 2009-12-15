@@ -1,4 +1,4 @@
-(ns mudphone.hbase-runner.utils.find)
+(ns hbase-runner.utils.find)
 
 (defn is-in-table-ns [table-ns table-name]
   (not (nil? (re-find (re-pattern (str "^" table-ns)) table-name))))

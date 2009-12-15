@@ -1,5 +1,5 @@
-(ns mudphone.hbase-runner.config.hbase-runner
-  (:use mudphone.hbase-runner.utils.file))
+(ns hbase-runner.config.hbase-runner
+  (:use hbase-runner.utils.file))
 
 (def *hbase-runner-config*
      (let [hbase-runner-home (or (System/getenv "HBASE_RUNNER_HOME")

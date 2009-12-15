@@ -1,4 +1,4 @@
-(ns mudphone.hbase-runner.utils.truncate
+(ns hbase-runner.utils.truncate
   (:use clojure.contrib.pprint))
 
 (defn filter-truncated [results]

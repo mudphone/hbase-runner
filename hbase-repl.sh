@@ -7,8 +7,8 @@ if [ -z "${HBASE_RUNNER_HOME}" ]; then
 fi
 
 # You can probably leave the rest alone:
-CLOJURE_DIR="${HBASE_RUNNER_HOME}/lib/java"
-CP_JARS="${CLOJURE_DIR}/*"
+LIB_DIR="${HBASE_RUNNER_HOME}/lib"
+CP_JARS="${LIB_DIR}/*"
 CP="${CP_JARS}:${HBASE_RUNNER_HOME}/src"
 
 # Add extra classpath, if any -- for example the location of hbase-site.xml.

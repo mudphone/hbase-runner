@@ -1,14 +1,14 @@
-(ns mudphone.hbase-runner.hbase-repl
+(ns hbase-runner.hbase-repl
   (:import [java.io File])
   (:import [org.apache.hadoop.hbase HBaseConfiguration HConstants])
   (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable Scan])
   (:require [clojure.contrib [str-utils :as str-utils]])
-  (:use mudphone.hbase-runner.config.hbase-runner)
-  (:use mudphone.hbase-runner.utils.clojure)
-  (:use mudphone.hbase-runner.utils.file)
-  (:use mudphone.hbase-runner.utils.find)
-  (:use mudphone.hbase-runner.utils.create)
-  (:use mudphone.hbase-runner.utils.truncate)
+  (:use hbase-runner.config.hbase-runner)
+  (:use hbase-runner.utils.clojure)
+  (:use hbase-runner.utils.file)
+  (:use hbase-runner.utils.find)
+  (:use hbase-runner.utils.create)
+  (:use hbase-runner.utils.truncate)
   (:use clojure.contrib.pprint))
 
 (defn set-current-table-ns [current-ns]
@@ -20,7 +20,7 @@
       current-ns
       (hbr*default-table-ns))))
 
-(defn- read-conn-config []
+(defn read-conn-config []
   (let [config-file (str (hbr*config-dir) "/connections.clj")]
     (try
      (load-file config-file)
@@ -30,7 +30,7 @@
                 config-file)
        (System/exit 1)))))
 
-(defn- hbase-configuration
+(defn hbase-configuration
   ([]
      (hbase-configuration :default))
   ([system]
@@ -43,6 +43,7 @@
            (throw (Exception. "No matching system config.")))
          (let [merged-config (merge
                               (:default user-configs) (system user-configs))
+               _ (pprint merged-config)
                hbase-config (HBaseConfiguration.)]
            (doto hbase-config
              (.setInt "hbase.client.retries.number"
@@ -53,15 +54,22 @@
                       (:hbase.master merged-config))
              (.set    "hbase.zookeeper.quorum"
                       (:hbase.zookeeper.quorum merged-config))
-             (.setBoolean "hbase.cluster.distributed"
-                          (:hbase.cluster.distributed merged-config))
-             (.set "hbase.rootdir"
-                   (:hbase.rootdir merged-config))
-             ))))))
+             )
+           (if (:hbase.cluster.distribued merged-config)
+             (doto hbase-config
+              (.setBoolean "hbase.cluster.distributed"
+                           (:hbase.cluster.distributed merged-config))
+              (.set "hbase.rootdir"
+                   (:hbase.rootdir merged-config)))
+             )
+           hbase-config)))))
 
 (declare *HBaseConfiguration*)
-(defn- hbase-admin []
-  (HBaseAdmin. *HBaseConfiguration*))
+(defn hbase-admin []
+  (println "Before hbase-admin")
+  (pprint *HBaseConfiguration*)
+  (HBaseAdmin. *HBaseConfiguration*)
+  (println "After hbase-admin"))
 
 (defn print-current-settings []
   (println "HBase Runner Home is:" (hbr*hbase-runner-home))
@@ -89,7 +97,9 @@
   ([system table-ns]
      (set-current-table-ns table-ns)
      (def *HBaseConfiguration* (hbase-configuration system))
+     (println "After HBaseConfig")
      (def *HBaseAdmin* (hbase-admin))
+     (println "After HBaseAdmin")
      (dosync
       (alter *hbase-runner-config* assoc :system system))
      (print-current-settings)))

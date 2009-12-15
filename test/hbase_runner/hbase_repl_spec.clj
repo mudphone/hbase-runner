@@ -1,9 +1,9 @@
-(ns mudphone.hbase-runner-spec
+(ns hbase-runner.hbase-repl-spec
   (:require [clojure.contrib.java-utils :as java-utils])
   (:use [clojure.test :only [run-tests deftest is]])
-  (:use mudphone.hbase-runner.config.hbase-runner)
-  (:use mudphone.hbase-runner.spec-helper)
-  (:use mudphone.hbase-runner.hbase-repl))
+  (:use hbase-runner.config.hbase-runner)
+  (:use hbase-runner.spec-helper)
+  (:use hbase-runner.hbase-repl))
 
 (deftest current-table-ns-test
   (is (= "hbr_spec" (current-table-ns))))

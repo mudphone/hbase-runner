@@ -1,2 +1,2 @@
-(use 'mudphone.hbase-runner.hbase-repl)
+(use 'hbase-runner.hbase-repl)
 (use 'clojure.contrib.pprint)

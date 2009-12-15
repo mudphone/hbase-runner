@@ -1,8 +1,8 @@
-(ns mudphone.hbase-runner.utils.create
+(ns hbase-runner.utils.create
   (:import [org.apache.hadoop.hbase HColumnDescriptor HTableDescriptor])
   (:import [org.apache.hadoop.hbase.client HTable])
-  (:use mudphone.hbase-runner.utils.clojure)
-  (:use mudphone.hbase-runner.utils.file))
+  (:use hbase-runner.utils.clojure)
+  (:use hbase-runner.utils.file))
 
 (defn- compression-name-for [hcolumn-descriptor]
   (.getName (.getCompression hcolumn-descriptor)))
