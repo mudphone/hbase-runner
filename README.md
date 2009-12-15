@@ -236,23 +236,22 @@ Enjoy!
 
 # Thanks go to:
 
-- Amit Rathore (#amitrathore) - Much code was taken from his
-                                clojure util libraries.
-- Clojure Contrib Authors - I borrowed and stole much.
+Amit Rathore (#amitrathore) - Much code was taken from his clojure utils.
+Clojure Contrib Authors - I borrowed and stole much.
 
-- For keeping our HBase up and getting us up to the required number of nodes:
+For keeping our HBase up and getting us up to the required number of nodes:
   * Siva Jagadeesan (#sivajag)
   * Robert J. Berger (#rberger)
 
-- HBase Team:
-  For tons of help on IRC:
+HBase Team:
+For tons of help on IRC:
   * Michael Stack (#St^Ack)
   * Ryan Rawson (#dj_ryan)
   * J-D Cryans (#jdcryans)
 
-  You can find me logged in as #mudphone.
+You can find me logged in as #mudphone.
 
-- And, everyone else working on HBase.  Thanks!!!
+And, everyone else working on HBase.  Thanks!!!
 
 
                                        ,.:r,          
