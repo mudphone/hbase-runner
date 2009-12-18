@@ -242,7 +242,7 @@ Enjoy!
              "close_region"
 - Complete test coverage of full public API.
 - Remove hard-coded (ooops) output / input file paths for table dump files.
-
+- Instructions for clojure-test minor mode to run tests.
 
 # Thanks go to:
 
