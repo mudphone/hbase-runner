@@ -9,7 +9,8 @@
      (let [start-time# (System/nanoTime)
            result# (do ~@body)
            end-time# (- (System/nanoTime) start-time#)]
-       (println "Call to" (var ~fname) "with" ~args "took" end-time# "nanoseconds.")
+       (println "Call to" (var ~fname) "with" ~args
+                "took" end-time# "nanoseconds.")
        result#)))
 
 (defn byte-array-to-str [byte-array]
