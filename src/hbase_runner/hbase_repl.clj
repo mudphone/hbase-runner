@@ -180,4 +180,4 @@
     (reduce + (pmap #(count-region htable %1 %2) start-keys end-keys))))
 
 (defn describe [table-name]
-  (.toString (.getTableDescriptor *HBaseAdmin*)))
+  (.toString (.getTableDescriptor *HBaseAdmin* (.getBytes table-name))))
