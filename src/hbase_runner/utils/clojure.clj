@@ -11,3 +11,6 @@
            end-time# (- (System/nanoTime) start-time#)]
        (println "Call to" (var ~fname) "with" ~args "took" end-time# "nanoseconds.")
        result#)))
+
+(defn byte-array-to-str [byte-array]
+  (apply str (map char byte-array)))

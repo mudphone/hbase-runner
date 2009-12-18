@@ -85,6 +85,9 @@
 (defn flush-table [table-name]
   (flush-table-or-region table-name))
 
+(defn compact [table-or-region-name]
+  (.compact *HBaseAdmin* table-or-region-name))
+
 (defn major-compact [table-name-or-region-name]
   (.majorCompact *HBaseAdmin* table-name-or-region-name))
 
@@ -158,9 +161,6 @@
 (defn table-exists? [table-name]
   (not (nil? (some #(= table-name %) (list-all-tables)))))
 
-(defn byte-array-to-str [byte-array]
-  (apply str (map char byte-array)))
-
 (defn count-region [htable start-key end-key]
   (let [descriptor (.getTableDescriptor htable)
         first-family (first (.getFamilies descriptor))
@@ -181,3 +181,6 @@
 
 (defn describe [table-name]
   (.toString (.getTableDescriptor *HBaseAdmin* (.getBytes table-name))))
+
+(defn meta-table []
+  (HTable. HConstants/META_TABLE_NAME))
