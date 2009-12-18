@@ -71,7 +71,7 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
      - eval buffer
            EMACS: M-x slime-eval-buffer (or C-z on my set-up)
      - enter the spec's namespace:
-           user> (in-ns 'mudphone.hbase-runner-spec)
+           user> (in-ns 'hbase-runner-spec)
      - connect to the test DB:
            user> (start-hbase-repl :test "hbr_spec")
      - run all specs:
@@ -133,12 +133,22 @@ To get a REPL, you can use the hbase-repl.sh script:
 
 ### Via Emacs
 
+## However you get Slime / Swank working with Clojure:
+
 If you're using Emacs, and you're working with Slime, you can include the
 library like this:
-    user=> (require 'mudphone.hbase-runner.hbase-repl)
+    user=> (use 'hbase-runner.hbase-repl)
 
-And, you can throw yourself into the namespace if you want, like this:
-    user=> (in-ns 'mudphone.hbase-runner.hbase-repl)
+## Using swank-clojure-project
+
+Do a:
+    M-x swank-clojure-project
+Then, select the cloned root directory.
+You should then be able to:
+    user=> (use 'hbase-repl.hbase-runner)
+    user=> (start-hbase-repl)
+
+That is, provided you have your config/connections.clj in order.
 
 
 ### In General
