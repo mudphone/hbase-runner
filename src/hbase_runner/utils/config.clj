@@ -1,4 +1,4 @@
-(ns hbase-runner.config.hbase-runner
+(ns hbase-runner.utils.config
   (:import [org.apache.hadoop.hbase HBaseConfiguration])
   (:use hbase-runner.utils.file))
 
