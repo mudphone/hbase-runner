@@ -239,9 +239,9 @@ Enjoy!
 # TODO (in rough order of precedence):
 - Make this a comprehensive replacement for the HBase shell.
 - Implement:
-    "regions-for-table"
-    "diable-drop-table-if-exists"
-    "close_region"
+      "regions-for-table"
+      "diable-drop-table-if-exists"
+      "close_region"
 - Complete test coverage of full public API.
 - Remove hard-coded (ooops) output / input file paths for table dump files.
 - Instructions for clojure-test minor mode to run tests.
