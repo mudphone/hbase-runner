@@ -133,13 +133,13 @@ To get a REPL, you can use the hbase-repl.sh script:
 
 ### Via Emacs
 
-## However you get Slime / Swank working with Clojure:
+#### However you get Slime / Swank working with Clojure:
 
 If you're using Emacs, and you're working with Slime, you can include the
 library like this:
     user=> (use 'hbase-runner.hbase-repl)
 
-## Using swank-clojure-project
+#### Using swank-clojure-project
 
 Do a:
     M-x swank-clojure-project
