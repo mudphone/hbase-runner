@@ -211,6 +211,7 @@ count-region [htable start-key end-key]
 count-rows [table-name]
 create-table-from [descriptor]
 current-table-ns []
+describe [table-name]
 disable-table [table-name]
 drop-table [table-name]
 dump-tables
