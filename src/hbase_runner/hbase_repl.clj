@@ -1,8 +1,11 @@
 (ns hbase-runner.hbase-repl
   (:import [java.io File])
-  (:import [org.apache.hadoop.hbase HConstants])
-  (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable Scan])
+  (:import [org.apache.hadoop.hbase HConstants HRegionInfo])
+  (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable Put Scan])
+  (:import [org.apache.hadoop.hbase.util Writables])
   (:require [clojure.contrib [str-utils :as str-utils]])
+  (:use hbase-runner.hbase.get)
+  (:use hbase-runner.hbase.put)
   (:use hbase-runner.utils.clojure)
   (:use hbase-runner.utils.config)
   (:use hbase-runner.utils.file)
@@ -187,3 +190,15 @@
 
 (defn close-region [region-name]
   (.closeRegion *HBaseAdmin* (.getBytes region-name)))
+
+(defn online [region-name turn-on-off]
+  (let [meta (meta-table)
+        columns [[HConstants/CATALOG_FAMILY HConstants/REGIONINFO_QUALIFIER]]
+        get (get-row-with-cols region-name columns)
+        hri-bytes (.value (.get meta get))
+        hri (doto (.getWritable Writables hri-bytes (HRegionInfo.))
+              (.setOffline turn-on-off))
+        put (put-for-row region-name [[HConstants/CATALOG_FAMILY
+                                       HConstants/REGIONINFO_QUALIFIER
+                                       (.getBytes Writables hri)]])]
+    (.put meta put)))
