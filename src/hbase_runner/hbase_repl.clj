@@ -184,3 +184,6 @@
 
 (defn meta-table []
   (HTable. HConstants/META_TABLE_NAME))
+
+(defn close-region [region-name]
+  (.closeRegion *HBaseAdmin* (.getBytes region-name)))
