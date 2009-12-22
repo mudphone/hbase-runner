@@ -207,37 +207,37 @@ To re-create the first table with an error (assuming it was dropped):
 
 The current public API includes:
 
-close-region [region-name]
-compact [table-or-region-name]
-count-region [htable start-key end-key]
-count-rows [table-name]
-create-table-from [descriptor]
-current-table-ns []
-describe [table-name]
-disable-drop-table [table-name]
-disable-table [table-name]
-drop-table [table-name]
-dump-tables
-enable-table [table-name]
-find-all-tables [search-str]
-find-tables [search-str]
-flush-table [table-name]
-flush-table-or-region [table-name-or-region-name]
-hbase-admin []
-hbase-configuration
-hydrate-table-maps-from [file-name]
-list-all-tables []
-list-tables []
-major-compact [table-name-or-region-name]
-meta-table []
-online [region-name turn-on-off]
-print-current-settings []
-set-current-table-ns [current-ns]
-start-hbase-repl
-table-disabled? [table-name]
-table-enabled? [table-name]
-table-exists? [table-name]
-truncate-tables [table-name-list]
+    close-region [region-name]                       
+    compact [table-or-region-name]                   
+    count-region [htable start-key end-key]          
+    count-rows [table-name]                          
+    create-table-from [descriptor]                   
+    current-table-ns []                              
+    describe [table-name]                            
+    disable-drop-table [table-name]                  
+    disable-region [region-name]                     
+    disable-table [table-name]                       
+    drop-table [table-name]                          
+    dump-tables                                      
+    enable-region [region-name]                      
+    enable-table [table-name]                        
+    find-all-tables [search-str]                     
+    find-tables [search-str]                         
+    flush-table [table-name]                         
+    flush-table-or-region [table-name-or-region-name]
+    hbase-admin []                                   
+    hbase-configuration                              
+    hydrate-table-maps-from [file-name]              
+    list-all-tables []                               
+    list-tables []                                   
+    major-compact [table-name-or-region-name]        
+    print-current-settings []                        
+    set-current-table-ns [current-ns]                
+    start-hbase-repl                                 
+    table-disabled? [table-name]                     
+    table-enabled? [table-name]                      
+    table-exists? [table-name]                       
+    truncate-tables [table-name-list]                
 
 Enjoy!
 
