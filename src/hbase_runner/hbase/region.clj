@@ -9,13 +9,13 @@
   (HTable. HConstants/META_TABLE_NAME))
 
 (defn online [region-name set-offline]
-  (let [meta (meta-table)
+  (let [metat (meta-table)
         columns [[HConstants/CATALOG_FAMILY HConstants/REGIONINFO_QUALIFIER]]
-        get (get-row-with-cols region-name columns)
-        hri-bytes (.value (.get meta get))
-        hri (doto (.getWritable Writables hri-bytes (HRegionInfo.))
+        region-get (get-row-with-cols region-name columns)
+        hri-bytes (.value (.get metat region-get))
+        hri (doto (Writables/getWritable hri-bytes (HRegionInfo.))
               (.setOffline set-offline))
         put (put-for-row region-name [[HConstants/CATALOG_FAMILY
                                        HConstants/REGIONINFO_QUALIFIER
-                                       (.getBytes Writables hri)]])]
-    (.put meta put)))
+                                       (Writables/getBytes hri)]])]
+    (.put metat put)))

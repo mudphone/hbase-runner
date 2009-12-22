@@ -184,7 +184,8 @@
   (.toString (.getTableDescriptor *HBaseAdmin* (.getBytes table-name))))
 
 (defn close-region [region-name]
-  (.closeRegion *HBaseAdmin* (.getBytes region-name)))
+  (let [server nil]
+    (.closeRegion *HBaseAdmin* region-name server)))
 
 (defn enable-region [region-name]
   (online region-name false))
