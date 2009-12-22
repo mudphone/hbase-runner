@@ -183,9 +183,6 @@
 (defn describe [table-name]
   (.toString (.getTableDescriptor *HBaseAdmin* (.getBytes table-name))))
 
-(defn meta-table []
-  (HTable. HConstants/META_TABLE_NAME))
-
 (defn close-region [region-name]
   (.closeRegion *HBaseAdmin* (.getBytes region-name)))
 

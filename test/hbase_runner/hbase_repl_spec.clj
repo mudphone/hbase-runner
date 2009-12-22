@@ -3,7 +3,8 @@
   (:use [clojure.test :only [run-tests deftest is]])
   (:use hbase-runner.spec-helper)
   (:use hbase-runner.hbase-repl)
-  (:use hbase-runner.utils.config))
+  (:use hbase-runner.utils.config)
+  (:use hbase-runner.utils.file))
 
 (deftest current-table-ns-test
   (is (= "hbr_spec" (current-table-ns))))
@@ -20,10 +21,10 @@
     (with-test-tables [table-name]
       (create-table-if-does-not-exist table-name)
       (is (table-enabled? table-name))
-    
+
       (disable-table table-name)
       (is (table-disabled? table-name))
-    
+
       (enable-table table-name)
       (is (table-enabled? table-name)))))
 
@@ -47,5 +48,7 @@
     (with-test-tables [test-table]
       (with-cleared-file test-file-path
         (dump-tables [test-table] test-file-name)
-        (is (= "hbr_spec_t1" (:name (first (hydrate-table-maps-from test-file-name))))))
+        (is (= "hbr_spec_t1" (:name
+                              (first
+                               (read-clojure-lines-from test-file-path))))))
 )))

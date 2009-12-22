@@ -27,7 +27,7 @@
 (defn dump-table-to-ruby [output-dir htable]
   (let [file (str output-dir "/tables.rb")]
     (spit file (str (.getTableDescriptor htable)))))
-                                                                            
+
 (defn dump-tables-to-ruby [output-dir table-names]
   (map #(dump-table-to-ruby output-dir %) table-names))
 
