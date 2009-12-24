@@ -118,6 +118,22 @@
   (println "Enabling table" table-name "...")
   (.enableTable *HBaseAdmin* table-name))
 
+(defn enable-table-if-disabled [table-name]
+  (if (table-disabled? table-name)
+    (do
+      (enable-table table-name)
+      (println "Enabled:" table-name))
+    (println "Already enabled:" table-name)))
+
+(defn enable-tables
+  ([]
+     (enable-tables (list-tables)))
+  ([tables]
+     (dorun (pmap enable-table-if-disabled tables))))
+
+(defn enable-all-tables []
+  (enable-tables (list-all-tables)))
+
 (defn create-table-from [descriptor]
   (.createTable *HBaseAdmin* descriptor))
 
