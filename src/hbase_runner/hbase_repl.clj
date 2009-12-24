@@ -176,6 +176,13 @@
      :truncated (filter-truncated result)
      :all result
     }))
+(defn truncate-tables! [_tables]
+  (loop [tables _tables
+         count 1]
+    (if-not (empty? tables)
+      (if (= count 10)
+        (truncate-tables tables)
+        (recur (filter-errors-names (truncate-tables tables)) (inc count))))))
 
 (defn dump-tables
   ([table-names]
