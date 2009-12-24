@@ -105,6 +105,22 @@
   (println "Disabling table" table-name "...")
   (.disableTable *HBaseAdmin* table-name))
 
+(defn disable-table-if-enabled [table-name]
+  (if (table-enabled? table-name)
+    (do
+      (disable-table table-name)
+      (println "Disabled:" table-name))
+    (println "Already disabled:" table-name)))
+
+(defn disable-tables
+  ([]
+     (disable-tables (list-tables)))
+  ([tables]
+     (dorun (pmap disable-table-if-enabled tables))))
+
+(defn disable-all-tables []
+  (disable-tables (list-all-tables)))
+
 (declare table-exists?)
 (defn disable-drop-table [table-name]
   (if (table-exists? table-name)
