@@ -175,14 +175,30 @@
      :errors (filter-errors result)
      :truncated (filter-truncated result)
      :all result
-    }))
-(defn truncate-tables! [_tables]
-  (loop [tables _tables
-         count 1]
-    (if-not (empty? tables)
-      (if (= count 10)
-        (truncate-tables tables)
-        (recur (filter-errors-names (truncate-tables tables)) (inc count))))))
+     }))
+
+(defn truncate-tables!
+  ([tables]
+     (truncate-tables! tables 1))
+  ([tables count]
+     (enable-tables tables)
+     (cond
+      (not-every? table-exists? tables)
+      (println "All tables must exist.")
+
+      (not-every? table-enabled? tables)
+      (println "All tables must be enabled to proceed.")
+
+      (= count 10)
+      (do
+        (println "Last try to truncate tables:" count)
+        (truncate-tables tables))
+
+      (empty? tables)
+      (println "Done.")
+
+      :else
+      (recur (filter-errors-names (truncate-tables tables)) (inc count)))))
 
 (defn dump-tables
   ([table-names]
