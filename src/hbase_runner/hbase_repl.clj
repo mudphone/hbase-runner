@@ -1,7 +1,7 @@
 (ns hbase-runner.hbase-repl
   (:import [java.io File])
   (:import [org.apache.hadoop.hbase HConstants])
-  (:import [org.apache.hadoop.hbase.client HBaseAdmin HTable Scan])
+  (:import [org.apache.hadoop.hbase.client HTable Scan])
   (:require [clojure.contrib [str-utils :as str-utils]])
   (:use hbase-runner.hbase.region)
   (:use hbase-runner.utils.clojure)
@@ -20,16 +20,6 @@
     (if-not (nil? current-ns)
       current-ns
       (hbr*default-table-ns))))
-
-(defn hbase-configuration
-  ([]
-     (hbase-configuration :default))
-  ([system]
-     (hbase-config-for-system system)))
-
-(declare *HBaseConfiguration*)
-(defn hbase-admin []
-  (HBaseAdmin. *HBaseConfiguration*))
 
 (defn print-current-settings []
   (println "HBase Runner Home is:" (hbr*hbase-runner-home))
@@ -56,8 +46,8 @@
               (println "  Table namespace default is blank"))))
   ([system table-ns]
      (set-current-table-ns table-ns)
-     (def *HBaseConfiguration* (hbase-configuration system))
-     (def *HBaseAdmin* (hbase-admin))
+     (set-hbase-configuration system)
+     (set-hbase-admin)
      (dosync
       (alter *hbase-runner-config* assoc :system system))
      (print-current-settings)))

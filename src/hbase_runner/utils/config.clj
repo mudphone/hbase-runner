@@ -1,6 +1,9 @@
 (ns hbase-runner.utils.config
   (:import [org.apache.hadoop.hbase HBaseConfiguration])
+  (:import [org.apache.hadoop.hbase.client HBaseAdmin])
   (:use hbase-runner.utils.file))
+
+(declare *HBaseAdmin* *HBaseConfiguration*)
 
 (def *hbase-runner-config*
      (let [hbase-runner-home (or (System/getenv "HBASE_RUNNER_HOME")
@@ -63,3 +66,18 @@
                   (:hbase.rootdir merged-config)))
           )
         hbase-config))))
+
+(defn hbase-admin []
+  (HBaseAdmin. *HBaseConfiguration*))
+
+(defn hbase-configuration
+  ([]
+     (hbase-configuration :default))
+  ([system]
+     (hbase-config-for-system system)))
+
+(defn set-hbase-configuration [system]
+  (def *HBaseConfiguration* (hbase-configuration system)))
+
+(defn set-hbase-admin []
+  (def *HBaseAdmin* (hbase-admin)))
