@@ -145,6 +145,7 @@
   ([]
      (enable-tables (list-tables)))
   ([tables]
+     (println "Enabling" (count tables) "tables...")
      (dorun (pmap enable-table-if-disabled tables))))
 
 (defn enable-all-tables []
@@ -181,6 +182,7 @@
   ([tables]
      (truncate-tables! tables 1))
   ([tables count]
+     (println "Begin iteration" count)
      (enable-tables tables)
      (cond
       (not-every? table-exists? tables)
