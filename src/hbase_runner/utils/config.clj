@@ -7,7 +7,7 @@
 
 (def *hbase-runner-config*
      (let [hbase-runner-home (or (System/getenv "HBASE_RUNNER_HOME")
-                                 (this-script-path))] 
+                                 (this-script-path))]
        (ref {
              :hbase-runner-home hbase-runner-home
              :config-dir (str hbase-runner-home "/config")
