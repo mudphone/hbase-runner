@@ -264,14 +264,20 @@
                      columns (columns-for table-name)
                      cache true}}]
      (let [options {:limit limit
-                 :max-length max-length
-                 :filter filter
-                 :timestamp timestamp
-                 :cache cache}
+                    :max-length max-length
+                    :filter filter
+                    :timestamp timestamp
+                    :cache cache}
            columns (columns-from-coll-or-str columns)
            scan (scan-for-columns start-row stop-row columns options)
            scanner (.getScanner (hbase-table table-name) scan)
            ]
+       (println "cols are:" columns)
        (doseq [result (seq scanner)]
-         (println (byte-array-to-str (.getRow result))))
+         (dorun (map (fn [col]
+                       (println "col:" col " -- "
+                                (byte-array-to-str
+                                 (.getValue result (.getBytes col))))) columns))
+         ;; (println (byte-array-to-str (.getRow result)))
+         )
        )))

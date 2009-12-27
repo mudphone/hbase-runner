@@ -2,8 +2,22 @@
   (:import [org.apache.hadoop.hbase.client Scan])
   (:use [clojure.contrib.str-utils :only [re-split str-join]]))
 
-(defn- add-cols-to-scan [scan cols]
-  (.addColumns scan (str-join " " cols)))
+;; (defn- add-cols-to-scan [scan cols]
+;;   (println "adding cols:" cols)
+;;   (println "col str:" (str-join " " cols))
+;;   (.addColumns scan (str-join " " cols)))
+
+(defn- reverse-sort [coll]
+  (reverse (sort coll)))
+
+(defn- add-col-to [scan col-str]
+  (.addColumn scan (.getBytes col-str)))
+
+(defn add-cols-to-scan [scan cols]
+  (println "adding cols:" cols)
+  (println "col str:" (str-join " " cols))
+  (reduce add-col-to scan (reverse-sort cols))
+  )
 
 (defn- update-scan-if-input [scan scan-fn input]
   (or (and (not-empty input) (scan-fn input))
@@ -16,6 +30,7 @@
         scan (update-scan #(.setStartRow scan (.getBytes %)) start-row)
         scan (update-scan #(.setStopRow scan (.getBytes %)) stop-row)
         scan (update-scan #(add-cols-to-scan scan %) columns)
+        _ (println scan)
         scan (update-scan #(.setFilter scan %) filter)
         scan (update-scan #(.setTimeStamp scan %) timestamp)]
     (.setCacheBlocks scan cache)
