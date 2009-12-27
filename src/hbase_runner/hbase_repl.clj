@@ -4,6 +4,7 @@
   (:import [org.apache.hadoop.hbase.client HTable Scan])
   (:require [clojure.contrib [str-utils :as str-utils]])
   (:use hbase-runner.hbase.region)
+  (:use hbase-runner.hbase.table)
   (:use hbase-runner.utils.clojure)
   (:use hbase-runner.utils.config)
   (:use hbase-runner.utils.file)
@@ -53,8 +54,7 @@
      (print-current-settings)))
 
 (defn list-all-tables []
-  (let [htable-descriptors (.listTables *HBaseAdmin*)]
-    (map table-name-from htable-descriptors)))
+  (map table-name-from (all-htable-descriptors)))
 
 (defn list-tables []
   (filter (partial is-in-table-ns (current-table-ns)) (list-all-tables)))
@@ -146,7 +146,7 @@
 
 (def-timed-fn truncate-table [table-name]
   (println "Truncating table" table-name "...")
-  (let [descriptor (.getTableDescriptor *HBaseAdmin* (.getBytes table-name))
+  (let [descriptor (htable-descriptor-for table-name)
         result {:name table-name :descriptor descriptor}]
     (try
      (disable-table table-name)
@@ -228,7 +228,7 @@
     (reduce + (pmap #(count-region htable %1 %2) start-keys end-keys))))
 
 (defn describe [table-name]
-  (.toString (.getTableDescriptor *HBaseAdmin* (.getBytes table-name))))
+  (.toString (htable-descriptor-for table-name)))
 
 (defn close-region [region-name]
   (let [server nil]
@@ -239,3 +239,14 @@
 
 (defn disable-region [region-name]
   (online region-name true))
+
+(defn scan [{:keys [limit max-length]
+             :or {limit -1
+                  max-length -1
+                  filter nil
+                  start-row ""
+                  stop-row nil
+                  timestamp nil
+                  cache true}}]
+  (println "Limit is" limit)
+  )

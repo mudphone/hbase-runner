@@ -3,4 +3,16 @@
   (:use hbase-runner.utils.config))
 
 (defn hbase-table [table-name]
- (HTable. *HBaseConfiguration* table-name))
+  (HTable. *HBaseConfiguration* table-name))
+
+(defn all-htable-descriptors []
+  (.listTables *HBaseAdmin*))
+
+(defn htable-descriptor-for [table-name]
+  (.getTableDescriptor *HBaseAdmin* (.getBytes table-name)))
+
+(defn hcolumn-descriptors-for [table-name]
+  (.getFamilies (htable-descriptor-for table-name)))
+
+(defn columns-for [table-name]
+  (map #(str (.getNameAsString %) ":") (hcolumn-descriptors-for table-name)))
