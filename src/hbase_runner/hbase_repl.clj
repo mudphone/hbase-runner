@@ -253,7 +253,8 @@
   ([table-name]
      (scan table-name {}))
 
-  ([table-name {:keys [start-row stop-row columns]
+  ([table-name {:keys [start-row stop-row columns
+                       limit max-length filter timestamp cache]
                 :or {limit -1
                      max-length -1
                      filter nil
@@ -262,6 +263,15 @@
                      timestamp nil
                      columns (columns-for table-name)
                      cache true}}]
-     (let [columns (columns-from-coll-or-str columns)
-           scan (scan-for-columns start-row stop-row columns)]
+     (let [options {:limit limit
+                 :max-length max-length
+                 :filter filter
+                 :timestamp timestamp
+                 :cache cache}
+           columns (columns-from-coll-or-str columns)
+           scan (scan-for-columns start-row stop-row columns options)
+           scanner (.getScanner (hbase-table table-name) scan)
+           ]
+       (doseq [result (seq scanner)]
+         (println (byte-array-to-str (.getRow result))))
        )))
