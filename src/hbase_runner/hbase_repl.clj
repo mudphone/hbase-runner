@@ -1,9 +1,10 @@
 (ns hbase-runner.hbase-repl
   (:import [java.io File])
   (:import [org.apache.hadoop.hbase HConstants])
-  (:import [org.apache.hadoop.hbase.client HTable Scan])
+  (:import [org.apache.hadoop.hbase.client HTable])
   (:require [clojure.contrib [str-utils :as str-utils]])
   (:use hbase-runner.hbase.region)
+  (:use hbase-runner.hbase.scan)
   (:use hbase-runner.hbase.table)
   (:use hbase-runner.utils.clojure)
   (:use hbase-runner.utils.config)
@@ -213,7 +214,7 @@
   (let [descriptor (.getTableDescriptor htable)
         first-family (first (.getFamilies descriptor))
         first-family-name (byte-array-to-str (.getNameWithColon first-family))
-        scan (Scan. (.getBytes start-key) (.getBytes end-key))
+        scan (scan-for start-key end-key)
         result-scanner (.getScanner htable scan)]
     (count (seq result-scanner))))
 
@@ -240,13 +241,27 @@
 (defn disable-region [region-name]
   (online region-name true))
 
-(defn scan [{:keys [limit max-length]
-             :or {limit -1
-                  max-length -1
-                  filter nil
-                  start-row ""
-                  stop-row nil
-                  timestamp nil
-                  cache true}}]
-  (println "Limit is" limit)
-  )
+(defn- columns-from-coll-or-str [columns]
+  (cond
+   (coll? columns) columns
+   (string? columns) [columns]
+   :else (throw (Exception.
+                 (str ":columns must be specified as a single string"
+                      " column, or a collection of columns.")))))
+
+(defn scan
+  ([table-name]
+     (scan table-name {}))
+
+  ([table-name {:keys [start-row stop-row columns]
+                :or {limit -1
+                     max-length -1
+                     filter nil
+                     start-row ""
+                     stop-row nil
+                     timestamp nil
+                     columns (columns-for table-name)
+                     cache true}}]
+     (let [columns (columns-from-coll-or-str columns)
+           scan (scan-for-columns start-row stop-row columns)]
+       )))
