@@ -73,13 +73,14 @@
                      columns (columns-for table-name)
                      cache true
                      print-only true}}]
-     (let [options {:limit limit
-                    :max-length max-length
-                    :filter filter
-                    :timestamp timestamp
-                    :cache cache}
+     (let [scan-options {:max-length max-length
+                         :filter filter
+                         :timestamp timestamp
+                         :cache cache}
+           print-options {:print-only print-only
+                          :limit limit}
            columns (columns-from-coll-or-str columns)
-           scan (scan-for-columns start-row stop-row columns options)
+           scan (scan-for-columns start-row stop-row columns scan-options)
            scanner (.getScanner (hbase-table table-name) scan)]
-       (results-to-map (seq scanner) columns print-only)
+       (results-to-map (seq scanner) columns print-options)
        )))

@@ -14,12 +14,19 @@
 (defn- row-id-for [result]
   (byte-array-to-str (.getRow result)))
 
-(defn results-to-map [results columns print-only]
-  (if print-only
-    (doseq [result results]
-      (pprint {(row-id-for result)
-               (result-column-values-to-map result columns)}))
-    (reduce #(assoc %1
-               (row-id-for %2) (result-column-values-to-map %2 columns))
-            {} results))
+(defn- pprint-result [result columns ]
+  (pprint {(row-id-for result)
+           (result-column-values-to-map result columns)}))
+(defn- limit-results [limit results]
+  (or (and (> limit 0) (take limit results))
+      results))
+
+(defn results-to-map [results columns {:keys [limit print-only]}]
+  (let [limited-results #(limit-results limit results)]
+    (if print-only
+      (doseq [result (limited-results)]
+        (pprint-result result columns))
+      (reduce #(assoc %1
+                 (row-id-for %2) (result-column-values-to-map %2 columns))
+              {} (limited-results))))
   )

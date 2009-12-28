@@ -204,49 +204,58 @@ To re-create the first table with an error (assuming it was dropped):
 
 The current public API includes:
 
-    close-region [region-name]                       
-    compact [table-or-region-name]                   
-    count-region [htable start-key end-key]          
-    count-rows [table-name]                          
-    create-table-from [descriptor]                   
-    current-table-ns []                              
-    describe [table-name]                            
-    disable-drop-table [table-name]                  
-    disable-region [region-name]                     
-    disable-table [table-name]                       
-    drop-table [table-name]                          
-    dump-tables                                      
-    enable-region [region-name]                      
-    enable-table [table-name]                        
-    find-all-tables [search-str]                     
-    find-tables [search-str]                         
-    flush-table [table-name]                         
+    close-region [region-name]
+    compact [table-or-region-name]
+    count-region [htable start-key end-key]
+    count-rows [table-name]
+    create-table-from [descriptor]
+    current-table-ns []
+    describe [table-name]
+    disable-all-tables []
+    disable-drop-table [table-name]
+    disable-region [region-name]
+    disable-table [table-name]
+    disable-table-if-enabled [table-name]
+    disable-tables
+    drop-table [table-name]
+    dump-tables
+    enable-all-tables []
+    enable-region [region-name]
+    enable-table [table-name]
+    enable-table-if-disabled [table-name]
+    enable-tables
+    find-all-tables [search-str]
+    find-tables [search-str]
+    flush-table [table-name]
     flush-table-or-region [table-name-or-region-name]
-    hbase-admin []                                   
-    hbase-configuration                              
-    hydrate-table-maps-from [file-name]              
-    list-all-tables []                               
-    list-tables []                                   
-    major-compact [table-name-or-region-name]        
-    print-current-settings []                        
-    set-current-table-ns [current-ns]                
-    start-hbase-repl                                 
-    table-disabled? [table-name]                     
-    table-enabled? [table-name]                      
-    table-exists? [table-name]                       
-    truncate-tables [table-name-list]                
+    hydrate-table-maps-from [file-name]
+    list-all-tables []
+    list-tables []
+    major-compact [table-name-or-region-name]
+    print-current-settings []
+    scan [ & args ]
+    scan!
+    set-current-table-ns [current-ns]
+    start-hbase-repl
+    table-disabled? [table-name]
+    table-enabled? [table-name]
+    table-exists? [table-name]
+    truncate-tables [table-name-list]
+    truncate-tables!
 
 Enjoy!
 
 
 # TODO (in rough order of precedence):
 - Make this a comprehensive replacement for the HBase shell.
+- Default scan should show all family:qualifier combinations 
+(not just all families)
+- Scan should not need to pass list of columns around everywhere.
 - Implement:
     * regions-for-table
     * close all regions for a table (if this is a good idea)
 - Complete test coverage of full public API.
 - Remove hard-coded (ooops) output / input file paths for table dump files.
-- Instructions for clojure-test minor mode to run tests.
 
 # Thanks go to:
 
