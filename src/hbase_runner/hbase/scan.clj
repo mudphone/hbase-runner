@@ -7,16 +7,24 @@
 ;;   (println "col str:" (str-join " " cols))
 ;;   (.addColumns scan (str-join " " cols)))
 
-(defn- reverse-sort [coll]
-  (reverse (sort coll)))
+(defn- columns-from-coll-or-str [columns]
+  (cond
+   (coll? columns) columns
+   (string? columns) [columns]
+   :else (throw (Exception.
+                 (str ":columns must be specified as a single string"
+                      " column, or a collection of columns.")))))
 
-(defn- add-col-to [scan col-str]
-  (.addColumn scan (.getBytes col-str)))
+(defn- add-family-qualifier-to [scan col-str]
+  (let [col-qual (map #(.getBytes %1) (re-split #":" col-str 2))]
+    (if (= (count col-qual) 2)
+      (apply #(.addColumn scan %1 %2) col-qual)
+      (apply #(.addColumn scan %1) col-qual))))
 
-(defn add-cols-to-scan [scan cols]
+(defn- add-cols-to-scan [scan cols]
   (println "adding cols:" cols)
   (println "col str:" (str-join " " cols))
-  (reduce add-col-to scan (reverse-sort cols))
+  (reduce add-family-qualifier-to scan cols)
   )
 
 (defn- update-scan-if-input [scan scan-fn input]

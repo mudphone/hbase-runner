@@ -5,6 +5,7 @@
   (:require [clojure.contrib [str-utils :as str-utils]])
   (:use hbase-runner.hbase.region)
   (:use hbase-runner.hbase.scan)
+  (:use hbase-runner.hbase.result)
   (:use hbase-runner.hbase.table)
   (:use hbase-runner.utils.clojure)
   (:use hbase-runner.utils.config)
@@ -241,14 +242,6 @@
 (defn disable-region [region-name]
   (online region-name true))
 
-(defn- columns-from-coll-or-str [columns]
-  (cond
-   (coll? columns) columns
-   (string? columns) [columns]
-   :else (throw (Exception.
-                 (str ":columns must be specified as a single string"
-                      " column, or a collection of columns.")))))
-
 (defn scan
   ([table-name]
      (scan table-name {}))
@@ -273,11 +266,13 @@
            scanner (.getScanner (hbase-table table-name) scan)
            ]
        (println "cols are:" columns)
-       (doseq [result (seq scanner)]
-         (dorun (map (fn [col]
-                       (println "col:" col " -- "
-                                (byte-array-to-str
-                                 (.getValue result (.getBytes col))))) columns))
-         ;; (println (byte-array-to-str (.getRow result)))
-         )
+       (pprint (results-to-map (seq scanner) columns))
+       ;; (doseq [result (seq scanner)]
+       ;;   (dorun (map (fn [col]
+       ;;                 (println "col:" col " -- "
+       ;;                          (byte-array-to-str
+       ;;                           (.getValue result (.getBytes col))))) columns))
+       ;;   ;; (println (byte-array-to-str (.getRow result)))
+         
+       ;;   )
        )))
