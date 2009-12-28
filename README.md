@@ -64,24 +64,21 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 
   1. Running tests from the command-line:
          $> ./run_tests.sh
+     This is probably the best way to run all the tests at once.
 
   2. Running tests from the Emacs REPL:
-     - Start slime.
-     - open the spec file you want to run
-     - eval buffer
-           EMACS: M-x slime-eval-buffer (or C-z on my set-up)
-     - enter the spec's namespace:
-           user> (in-ns 'hbase-runner-spec)
-     - connect to the test DB:
+     If you have swank-clojure-project working, you can:
+     - start a new swank clojure project:
+           M-x swank-clojure-project
+     - pass it the root dir of the hbase-runner project
+     - start the hbase-runner REPL (connect to the test DB):
+           user> (use 'hbase-runner.hbase-repl)
            user> (start-hbase-repl :test "hbr_spec")
-     - run all specs:
-           user> (run-tests)
-     - run a focused spec:
-           user> (dump-table-test)
-
-  3. Actually, the easiest way to run the tests is via swank-clojure-project
-     and the clojure-test minor mode.  If you have those set up, you can just
-     open a spec buffer and run C-c C-,
+     - open the spec file you want to run
+     - run tests in the opened buffer
+           C-c C-,
+     - errors will be hilighted in red, for details, move the point and press
+           C-c C-'
 
 
 # KNOWN BUGS:
