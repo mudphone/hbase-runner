@@ -245,7 +245,7 @@
   "Return results of scan (which may use a lot of memory).
    See 'scan' for print-only version of this function."
   ([table-name]
-     (scan-table table-name))
+     (scan! table-name {}))
   ([table-name options]
      (scan-table table-name (merge options {:print-only false}))))
 
