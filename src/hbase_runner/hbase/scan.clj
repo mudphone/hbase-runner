@@ -1,11 +1,8 @@
 (ns hbase-runner.hbase.scan
   (:import [org.apache.hadoop.hbase.client Scan])
-  (:use [clojure.contrib.str-utils :only [re-split str-join]]))
-
-;; (defn- add-cols-to-scan [scan cols]
-;;   (println "adding cols:" cols)
-;;   (println "col str:" (str-join " " cols))
-;;   (.addColumns scan (str-join " " cols)))
+  (:use [clojure.contrib.str-utils :only [re-split str-join]])
+  (:use hbase-runner.hbase.result)
+  (:use hbase-runner.hbase.table))
 
 (defn- columns-from-coll-or-str [columns]
   (cond
@@ -22,10 +19,7 @@
       (apply #(.addColumn scan %1) col-qual))))
 
 (defn- add-cols-to-scan [scan cols]
-  (println "adding cols:" cols)
-  (println "col str:" (str-join " " cols))
-  (reduce add-family-qualifier-to scan cols)
-  )
+  (reduce add-family-qualifier-to scan cols))
 
 (defn- update-scan-if-input [scan scan-fn input]
   (or (and (not-empty input) (scan-fn input))
@@ -38,7 +32,6 @@
         scan (update-scan #(.setStartRow scan (.getBytes %)) start-row)
         scan (update-scan #(.setStopRow scan (.getBytes %)) stop-row)
         scan (update-scan #(add-cols-to-scan scan %) columns)
-        _ (println scan)
         scan (update-scan #(.setFilter scan %) filter)
         scan (update-scan #(.setTimeStamp scan %) timestamp)]
     (.setCacheBlocks scan cache)
@@ -64,3 +57,29 @@
      (scan-gen (merge
                 {:start-row start-row :stop-row stop-row :columns columns}
                 options))))
+
+(defn scan-table
+  ([table-name]
+     (scan-table table-name {}))
+
+  ([table-name {:keys [start-row stop-row columns
+                       limit max-length filter timestamp cache print-only]
+                :or {limit -1
+                     max-length -1
+                     filter nil
+                     start-row ""
+                     stop-row nil
+                     timestamp nil
+                     columns (columns-for table-name)
+                     cache true
+                     print-only true}}]
+     (let [options {:limit limit
+                    :max-length max-length
+                    :filter filter
+                    :timestamp timestamp
+                    :cache cache}
+           columns (columns-from-coll-or-str columns)
+           scan (scan-for-columns start-row stop-row columns options)
+           scanner (.getScanner (hbase-table table-name) scan)]
+       (results-to-map (seq scanner) columns print-only)
+       )))

@@ -3,17 +3,16 @@
   (:import [org.apache.hadoop.hbase HConstants])
   (:import [org.apache.hadoop.hbase.client HTable])
   (:require [clojure.contrib [str-utils :as str-utils]])
+  (:use [clojure.contrib.pprint :only [pp pprint]])
   (:use hbase-runner.hbase.region)
   (:use hbase-runner.hbase.scan)
-  (:use hbase-runner.hbase.result)
   (:use hbase-runner.hbase.table)
   (:use hbase-runner.utils.clojure)
   (:use hbase-runner.utils.config)
   (:use hbase-runner.utils.file)
   (:use hbase-runner.utils.find)
   (:use hbase-runner.utils.create)
-  (:use hbase-runner.utils.truncate)
-  (:use clojure.contrib.pprint))
+  (:use hbase-runner.utils.truncate))
 
 (defn set-current-table-ns [current-ns]
   (dosync
@@ -242,37 +241,14 @@
 (defn disable-region [region-name]
   (online region-name true))
 
-(defn scan
+(defn scan!
+  "Return results of scan (which may use a lot of memory).
+   See 'scan' for print-only version of this function."
   ([table-name]
-     (scan table-name {}))
+     (scan-table table-name))
+  ([table-name options]
+     (scan-table table-name (merge options {:print-only false}))))
 
-  ([table-name {:keys [start-row stop-row columns
-                       limit max-length filter timestamp cache]
-                :or {limit -1
-                     max-length -1
-                     filter nil
-                     start-row ""
-                     stop-row nil
-                     timestamp nil
-                     columns (columns-for table-name)
-                     cache true}}]
-     (let [options {:limit limit
-                    :max-length max-length
-                    :filter filter
-                    :timestamp timestamp
-                    :cache cache}
-           columns (columns-from-coll-or-str columns)
-           scan (scan-for-columns start-row stop-row columns options)
-           scanner (.getScanner (hbase-table table-name) scan)
-           ]
-       (println "cols are:" columns)
-       (pprint (results-to-map (seq scanner) columns))
-       ;; (doseq [result (seq scanner)]
-       ;;   (dorun (map (fn [col]
-       ;;                 (println "col:" col " -- "
-       ;;                          (byte-array-to-str
-       ;;                           (.getValue result (.getBytes col))))) columns))
-       ;;   ;; (println (byte-array-to-str (.getRow result)))
-         
-       ;;   )
-       )))
+(defn scan [ & args ]
+  "Print results of scan, but do not return them (to avoid using memory)."
+  (apply scan-table args))

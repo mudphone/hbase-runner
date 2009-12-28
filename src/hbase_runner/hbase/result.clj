@@ -1,4 +1,5 @@
 (ns hbase-runner.hbase.result
+  (:use [clojure.contrib.pprint :only [pprint]])
   (:use hbase-runner.utils.clojure))
 
 (defn- col-value [col result]
@@ -13,8 +14,12 @@
 (defn- row-id-for [result]
   (byte-array-to-str (.getRow result)))
 
-(defn results-to-map [results columns]
-  (reduce #(assoc %1
-             (row-id-for %2) (result-column-values-to-map %2 columns))
-          {} results)
+(defn results-to-map [results columns print-only]
+  (if print-only
+    (doseq [result results]
+      (pprint {(row-id-for result)
+               (result-column-values-to-map result columns)}))
+    (reduce #(assoc %1
+               (row-id-for %2) (result-column-values-to-map %2 columns))
+            {} results))
   )
