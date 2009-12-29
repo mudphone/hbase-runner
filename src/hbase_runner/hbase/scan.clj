@@ -16,7 +16,7 @@
   (let [col-qual (map #(.getBytes %1) (re-split #":" col-str 2))]
     (if (= (count col-qual) 2)
       (apply #(.addColumn scan %1 %2) col-qual)
-      (apply #(.addColumn scan %1) col-qual))))
+      (apply #(.addFamily scan %1) col-qual))))
 
 (defn- add-cols-to-scan [scan cols]
   (reduce add-family-qualifier-to scan cols))

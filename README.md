@@ -248,7 +248,7 @@ Enjoy!
 
 # TODO (in rough order of precedence):
 - Make this a comprehensive replacement for the HBase shell.
-- Default scan should show all family:qualifier combinations 
+- Default scan should show all family:qualifier combinations
 (not just all families)
 - Scan should not need to pass list of columns around everywhere.
 - Implement:
