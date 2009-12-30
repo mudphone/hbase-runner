@@ -120,7 +120,7 @@
        (if (table-enabled? table-name)
          (disable-table table-name))
        (drop-table table-name))
-     (println "Tables does not exist:" table-name "... skipping."))
+     (println "Table does not exist:" table-name "... skipping."))
    (catch Exception e
      (println "Exception processing table:" table-name)
      (println "Exception:")
