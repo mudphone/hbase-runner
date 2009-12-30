@@ -114,12 +114,17 @@
 
 (declare table-exists?)
 (defn disable-drop-table [table-name]
-  (if (table-exists? table-name)
-    (do
-      (if (table-enabled? table-name)
-        (disable-table table-name))
-      (drop-table table-name))
-    (println "Tables does not exist:" table-name "... skipping.")))
+  (try
+   (if (table-exists? table-name)
+     (do
+       (if (table-enabled? table-name)
+         (disable-table table-name))
+       (drop-table table-name))
+     (println "Tables does not exist:" table-name "... skipping."))
+   (catch Exception e
+     (println "Exception processing table:" table-name)
+     (println "Exception:")
+     (.printStackTrace e))))
 
 (defn enable-table [table-name]
   (println "Enabling table" table-name "...")
