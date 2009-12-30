@@ -21,19 +21,21 @@
 (defn- add-cols-to-scan [scan cols]
   (reduce add-family-qualifier-to scan cols))
 
-(defn- update-scan-if-input [scan scan-fn input]
-  (or (and (not-empty input) (scan-fn input))
+(defn- update-scan-if-input [scan input scan-update-fn]
+  (or (and (not-empty input) (scan-update-fn scan input))
       scan))
 
 (defn scan-gen [{:keys [scan start-row stop-row columns filter timestamp cache]
                  :or {scan (Scan.)
                       cache true}}]
-  (let [update-scan (partial update-scan-if-input scan)
-        scan (update-scan #(.setStartRow scan (.getBytes %)) start-row)
-        scan (update-scan #(.setStopRow scan (.getBytes %)) stop-row)
-        scan (update-scan #(add-cols-to-scan scan %) columns)
-        scan (update-scan #(.setFilter scan %) filter)
-        scan (update-scan #(.setTimeStamp scan %) timestamp)]
+  (let [scan 
+        (-> scan
+            (update-scan-if-input start-row #(.setStartRow %1 (.getBytes %2)))
+            (update-scan-if-input stop-row  #(.setStopRow %1 (.getBytes %2)))
+            (update-scan-if-input columns   #(add-cols-to-scan %1 %2))
+            (update-scan-if-input filter    #(.setFilter %1 %2))
+            (update-scan-if-input timestamp #(.setTimeStamp %1 %2))
+            )]
     (.setCacheBlocks scan cache)
     scan))
 
