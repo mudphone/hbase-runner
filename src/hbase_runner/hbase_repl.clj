@@ -100,7 +100,7 @@
 
 (defn disabled-tables
   ([]
-     (disable-tables (list-tables)))
+     (disabled-tables (list-tables)))
   ([tables]
      (remove false? (map #(and (table-disabled? %) %) tables))))
 
