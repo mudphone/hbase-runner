@@ -98,6 +98,15 @@
       (flush-table HConstants/META_TABLE_NAME)
       (major-compact HConstants/META_TABLE_NAME))))
 
+(defn disabled-tables
+  ([]
+     (disable-tables (list-tables)))
+  ([tables]
+     (remove false? (map #(and (table-disabled? %) %) tables))))
+
+(defn disabled-tables-all-ns []
+  (disabled-tables (list-all-tables)))
+
 (defn disable-table [table-name]
   (println "Disabling table" table-name "...")
   (.disableTable *HBaseAdmin* table-name))
