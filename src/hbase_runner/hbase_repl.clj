@@ -28,6 +28,12 @@
   (println "System is:" (name (keyword (hbr*system))))
   (println "Current table ns is:" (current-table-ns)))
 
+(defn public-api []
+  (sort (map first (ns-publics 'hbase-runner.hbase-repl))))
+
+(defn print-api []
+  (pprint (public-api)))
+
 (defn start-hbase-repl
   ([]
      (start-hbase-repl :default))
