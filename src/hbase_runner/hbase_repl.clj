@@ -248,6 +248,11 @@
     (println "total regions:" (count start-keys))
     (reduce + (pmap #(count-region htable %1 %2) start-keys end-keys))))
 
+(defn count-tables [table-names]
+  (->> table-names
+       (pmap count-rows)
+       (reduce +)))
+
 (defn describe [table-name]
   (.toString (htable-descriptor-for table-name)))
 
