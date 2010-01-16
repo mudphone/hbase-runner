@@ -28,6 +28,12 @@
   (println "System is:" (name (keyword (hbr*system))))
   (println "Current table ns is:" (current-table-ns)))
 
+(defn public-api []
+  (sort (map first (ns-publics 'hbase-runner.hbase-repl))))
+
+(defn print-api []
+  (pprint (public-api)))
+
 (defn start-hbase-repl
   ([]
      (start-hbase-repl :default))
@@ -91,6 +97,15 @@
       (.deleteTable *HBaseAdmin* table-name)
       (flush-table HConstants/META_TABLE_NAME)
       (major-compact HConstants/META_TABLE_NAME))))
+
+(defn disabled-tables
+  ([]
+     (disabled-tables (list-tables)))
+  ([tables]
+     (remove false? (map #(and (table-disabled? %) %) tables))))
+
+(defn disabled-tables-all-ns []
+  (disabled-tables (list-all-tables)))
 
 (defn disable-table [table-name]
   (println "Disabling table" table-name "...")
@@ -166,21 +181,35 @@
 
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")
-  (let [result (doall (pmap truncate-table table-name-list))]
-    (display-truncation-for result)
-    {
-     :errors (filter-errors result)
-     :truncated (filter-truncated result)
-     :all result
-     }))
+  (let [results (doall (pmap truncate-table table-name-list))]
+    (display-truncation-for results)
+    (package-results results)))
+
+(defn create-missing-results-tables [{error-results :errors
+                                      truncated-results :truncated}]
+  (let [create-missing (fn [{:keys [name descriptor] :as table-result}]
+                         (if (not (table-exists? name))
+                           (create-table-from descriptor))
+                         (assoc table-result :status :truncated))
+        new-results (map create-missing error-results)]
+    (package-results (concat truncated-results new-results))
+    ))
+
+(defn enable-disabled-results-tables [{all-results :all}]
+  (let [enable-disabled (fn [{:keys [name] :as table-result}]
+                          (enable-table-if-disabled name)
+                          table-result)
+        new-results (map enable-disabled all-results)]
+    (package-results new-results)))
 
 (defn truncate-tables!
   ([tables]
      (truncate-tables! tables 1))
   ([tables count]
-     (println "Begin iteration" count)
-     (enable-tables tables)
      (cond
+      (empty? tables)
+      (println "Done.")
+
       (not-every? table-exists? tables)
       (println "All tables must exist.")
 
@@ -192,11 +221,15 @@
         (println "Last try to truncate tables:" count)
         (truncate-tables tables))
 
-      (empty? tables)
-      (println "Done.")
-
       :else
-      (recur (filter-errors-names (truncate-tables tables)) (inc count)))))
+      (do
+        (println "Begin iteration" count)
+        (let [result (-> tables
+                         (truncate-tables)
+                         (create-missing-results-tables)
+                         (enable-disabled-results-tables))]
+          (recur (filter-errors-names result) (inc count))))
+      )))
 
 (defn dump-tables
   ([table-names]
@@ -232,6 +265,11 @@
     (println "end-keys:" (str-utils/str-join "-" end-keys))
     (println "total regions:" (count start-keys))
     (reduce + (pmap #(count-region htable %1 %2) start-keys end-keys))))
+
+(defn count-tables [table-names]
+  (->> table-names
+       (pmap count-rows)
+       (reduce +)))
 
 (defn describe [table-name]
   (.toString (htable-descriptor-for table-name)))

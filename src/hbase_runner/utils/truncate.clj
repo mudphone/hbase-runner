@@ -16,8 +16,15 @@
     (println "Tables with errors:" (count tables-with-errors))
     (pprint (map :name tables-with-errors))))
 
-(defn filter-truncated-names [pretty-results]
-  (map :name (:truncated pretty-results)))
+(defn filter-truncated-names [packaged-results]
+  (map :name (:truncated packaged-results)))
 
-(defn filter-errors-names [pretty-results]
-  (map :name (:errors pretty-results)))
+(defn filter-errors-names [packaged-results]
+  (map :name (:errors packaged-results)))
+
+(defn package-results [results]
+  {
+   :errors (filter-errors results)
+   :truncated (filter-truncated results)
+   :all results
+   })
