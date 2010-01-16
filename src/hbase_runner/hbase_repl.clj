@@ -181,21 +181,35 @@
 
 (defn truncate-tables [table-name-list]
   (println "Truncating" (count table-name-list) "tables ...")
-  (let [result (doall (pmap truncate-table table-name-list))]
-    (display-truncation-for result)
-    {
-     :errors (filter-errors result)
-     :truncated (filter-truncated result)
-     :all result
-     }))
+  (let [results (doall (pmap truncate-table table-name-list))]
+    (display-truncation-for results)
+    (package-results results)))
+
+(defn create-missing-results-tables [{error-results :errors
+                                      truncated-results :truncated}]
+  (let [create-missing (fn [{:keys [name descriptor] :as table-result}]
+                         (if (not (table-exists? name))
+                           (create-table-from descriptor))
+                         (assoc table-result :status :truncated))
+        new-results (map create-missing error-results)]
+    (package-results (concat truncated-results new-results))
+    ))
+
+(defn enable-disabled-results-tables [{all-results :all}]
+  (let [enable-disabled (fn [{:keys [name] :as table-result}]
+                          (enable-table-if-disabled name)
+                          table-result)
+        new-results (map enable-disabled all-results)]
+    (package-results new-results)))
 
 (defn truncate-tables!
   ([tables]
      (truncate-tables! tables 1))
   ([tables count]
-     (println "Begin iteration" count)
-     (enable-tables tables)
      (cond
+      (empty? tables)
+      (println "Done.")
+
       (not-every? table-exists? tables)
       (println "All tables must exist.")
 
@@ -207,11 +221,15 @@
         (println "Last try to truncate tables:" count)
         (truncate-tables tables))
 
-      (empty? tables)
-      (println "Done.")
-
       :else
-      (recur (filter-errors-names (truncate-tables tables)) (inc count)))))
+      (do
+        (println "Begin iteration" count)
+        (let [result (-> tables
+                         (truncate-tables)
+                         (create-missing-results-tables)
+                         (enable-disabled-results-tables))]
+          (recur (filter-errors-names result) (inc count))))
+      )))
 
 (defn dump-tables
   ([table-names]
