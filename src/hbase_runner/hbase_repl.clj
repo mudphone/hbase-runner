@@ -187,25 +187,31 @@
 
 (defn create-missing-results-tables [{error-results :errors
                                       truncated-results :truncated}]
+  (and (empty? error-results) (println "No missing tables."))
   (let [create-missing (fn [{:keys [name descriptor] :as table-result}]
-                         (if (not (table-exists? name))
-                           (create-table-from descriptor))
-                         (assoc table-result :status :truncated))
-        new-results (map create-missing error-results)]
+                         (if (table-exists? name)
+                           (do
+                             (println "Table already exists:" name)
+                             table-result)
+                           (do
+                             (println "Creating missing table:" name)
+                             (create-table-from descriptor)
+                             (assoc table-result :status :truncated))))
+        new-results (doall (map create-missing error-results))]
     (package-results (concat truncated-results new-results))
     ))
 
 (defn enable-disabled-results-tables [{all-results :all}]
   (let [enable-disabled (fn [{:keys [name] :as table-result}]
-                          (enable-table-if-disabled name)
-                          table-result)
-        new-results (map enable-disabled all-results)]
-    (package-results new-results)))
+                          (enable-table-if-disabled name))]
+    (dorun (map enable-disabled all-results))
+    (package-results all-results)))
 
 (defn truncate-tables!
   ([tables]
      (truncate-tables! tables 1))
-  ([tables count]
+  ([tables iteration-count]
+     (println "Begin iteration" iteration-count)
      (cond
       (empty? tables)
       (println "Done.")
@@ -216,19 +222,19 @@
       (not-every? table-enabled? tables)
       (println "All tables must be enabled to proceed.")
 
-      (= count 10)
+      (= iteration-count 10)
       (do
-        (println "Last try to truncate tables:" count)
+        (println "Last try to truncate tables:" iteration-count)
         (truncate-tables tables))
 
       :else
       (do
-        (println "Begin iteration" count)
         (let [result (-> tables
                          (truncate-tables)
                          (create-missing-results-tables)
                          (enable-disabled-results-tables))]
-          (recur (filter-errors-names result) (inc count))))
+          (println "Done with iteration" iteration-count)
+          (recur (doall (filter-errors-names result)) (inc iteration-count))))
       )))
 
 (defn dump-tables
