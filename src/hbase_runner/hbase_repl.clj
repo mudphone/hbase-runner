@@ -146,11 +146,12 @@
   (.enableTable *HBaseAdmin* table-name))
 
 (defn enable-table-if-disabled [table-name]
-  (if (table-disabled? table-name)
-    (do
-      (enable-table table-name)
-      (println "Enabled:" table-name))
-    (println "Already enabled:" table-name)))
+  (cond
+   (not (table-exists?)) (println "Cannot enable table which does not exist:" table-name)
+   (table-enabled?) (println "Already enabled:" table-name)
+   :else (do
+           (enable-table table-name)
+           (println "Enabled:" table-name))))
 
 (defn enable-tables
   ([]
