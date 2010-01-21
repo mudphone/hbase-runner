@@ -213,6 +213,7 @@
      (truncate-tables! tables 1))
   ([tables iteration-count]
      (println "Begin iteration" iteration-count)
+     (enable-tables tables)
      (cond
       (empty? tables)
       (println "Done.")
