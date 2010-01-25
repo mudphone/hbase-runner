@@ -2,11 +2,13 @@
   (:import [org.apache.hadoop.hbase HConstants HRegionInfo])
   (:import [org.apache.hadoop.hbase.client HTable])
   (:import [org.apache.hadoop.hbase.util Writables])
-  (:use hbase-runner.hbase.get)
-  (:use hbase-runner.hbase.put))
+  (:use hbase-runner.hbase.get
+        hbase-runner.hbase.put
+        hbase-runner.utils.config))
 
 (defn meta-table []
-  (HTable. HConstants/META_TABLE_NAME))
+  ;; (HTable. HConstants/META_TABLE_NAME)
+  (HTable. *HBaseConfiguration* HConstants/META_TABLE_NAME))
 
 (defn online [region-name set-offline]
   (let [metat (meta-table)
