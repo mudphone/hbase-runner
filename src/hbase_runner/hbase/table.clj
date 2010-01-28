@@ -14,5 +14,5 @@
 (defn hcolumn-families-for [table-name]
   (.getFamilies (htable-descriptor-for table-name)))
 
-(defn columns-for [table-name]
+(defn column-families-for [table-name]
   (map #(str (.getNameAsString %) ":") (hcolumn-families-for table-name)))

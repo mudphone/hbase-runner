@@ -6,6 +6,7 @@
 
 (defn- columns-from-coll-or-str [columns]
   (cond
+   (nil? columns) nil
    (coll? columns) columns
    (string? columns) [columns]
    :else (throw (Exception.
@@ -89,7 +90,7 @@
                      start-row ""
                      stop-row nil
                      timestamp nil
-                     columns (columns-for table-name)
+                     columns nil
                      cache true
                      print-only true}}]
      (let [scan-options {:max-length max-length
