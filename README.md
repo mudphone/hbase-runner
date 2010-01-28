@@ -203,11 +203,9 @@ To re-create the first table with an error (assuming it was dropped):
 
 
 The current public API includes:
-
-    close-region [region-name]
-    compact [table-or-region-name]
-    count-region [htable start-key end-key]
     count-rows [table-name]
+    count-tables [table-names]
+    create-missing-results-tables
     create-table-from [descriptor]
     current-table-ns []
     describe [table-name]
@@ -217,9 +215,12 @@ The current public API includes:
     disable-table [table-name]
     disable-table-if-enabled [table-name]
     disable-tables
+    disabled-tables
+    disabled-tables-all-ns []
     drop-table [table-name]
     dump-tables
     enable-all-tables []
+    enable-disabled-results-tables [{all-results :all}]
     enable-region [region-name]
     enable-table [table-name]
     enable-table-if-disabled [table-name]
@@ -232,7 +233,9 @@ The current public API includes:
     list-all-tables []
     list-tables []
     major-compact [table-name-or-region-name]
+    print-api []
     print-current-settings []
+    public-api []
     scan [ & args ]
     scan!
     set-current-table-ns [current-ns]
