@@ -127,7 +127,9 @@
 (defn disable-all-tables []
   (disable-tables (list-all-tables)))
 
-(declare table-exists?)
+(defn table-exists? [table-name]
+  (not (nil? (some #(= table-name %) (list-all-tables)))))
+
 (defn disable-drop-table [table-name]
   (try
    (if (table-exists? table-name)
@@ -146,11 +148,12 @@
   (.enableTable *HBaseAdmin* table-name))
 
 (defn enable-table-if-disabled [table-name]
-  (if (table-disabled? table-name)
-    (do
-      (enable-table table-name)
-      (println "Enabled:" table-name))
-    (println "Already enabled:" table-name)))
+  (cond
+   (not (table-exists? table-name)) (println "Cannot enable missing table:" table-name)
+   (table-enabled? table-name) (println "Already enabled:" table-name)
+   :else (do
+           (enable-table table-name)
+           (println "Enabled:" table-name))))
 
 (defn enable-tables
   ([]
@@ -185,27 +188,52 @@
     (display-truncation-for results)
     (package-results results)))
 
-(defn create-missing-results-tables [{error-results :errors
-                                      truncated-results :truncated}]
+(defn create-missing-results-tables [error-results]
   (let [create-missing (fn [{:keys [name descriptor] :as table-result}]
-                         (if (not (table-exists? name))
-                           (create-table-from descriptor))
-                         (assoc table-result :status :truncated))
-        new-results (map create-missing error-results)]
-    (package-results (concat truncated-results new-results))
-    ))
+                         (if (table-exists? name)
+                           (do
+                             (println "Table already exists:" name)
+                             table-result)
+                           (do
+                             (println "Creating missing table:" name)
+                             (create-table-from descriptor)
+                             (assoc table-result :status :truncated))))]
+    (map create-missing error-results)))
 
-(defn enable-disabled-results-tables [{all-results :all}]
+(defn optionally-create-missing-results-tables [{error-results :errors
+                                                 truncated-results :truncated
+                                                 :as original-results}]
+  (if (empty? error-results)
+    (do
+      (println "No missing tables.")
+      original-results)
+    (do
+      (let [new-results (doall (create-missing-results-tables error-results))]
+        (package-results (concat truncated-results new-results))
+        ))))
+
+(defn enable-disabled-results-tables [all-results]
   (let [enable-disabled (fn [{:keys [name] :as table-result}]
-                          (enable-table-if-disabled name)
-                          table-result)
-        new-results (map enable-disabled all-results)]
-    (package-results new-results)))
+                          (enable-table-if-disabled name))]
+    (map enable-disabled all-results)))
+
+(defn optionally-enable-disabled-results-tables [{error-results :errors
+                                                  all-results :all
+                                                  :as original-results}]
+  (if (empty? error-results)
+    (do
+      (println "No disabled tables.")
+      original-results)
+    (do
+      (dorun (enable-disabled-results-tables all-results))
+      (package-results all-results))))
 
 (defn truncate-tables!
   ([tables]
      (truncate-tables! tables 1))
-  ([tables count]
+  ([tables iteration-count]
+     (println "Begin iteration" iteration-count)
+     (enable-tables tables)
      (cond
       (empty? tables)
       (println "Done.")
@@ -216,19 +244,19 @@
       (not-every? table-enabled? tables)
       (println "All tables must be enabled to proceed.")
 
-      (= count 10)
+      (= iteration-count 10)
       (do
-        (println "Last try to truncate tables:" count)
+        (println "Last try to truncate tables:" iteration-count)
         (truncate-tables tables))
 
       :else
       (do
-        (println "Begin iteration" count)
         (let [result (-> tables
                          (truncate-tables)
-                         (create-missing-results-tables)
-                         (enable-disabled-results-tables))]
-          (recur (filter-errors-names result) (inc count))))
+                         (optionally-create-missing-results-tables)
+                         (optionally-enable-disabled-results-tables))]
+          (println "Done with iteration" iteration-count)
+          (recur (doall (filter-errors-names result)) (inc iteration-count))))
       )))
 
 (defn dump-tables
@@ -244,9 +272,6 @@
   (let [file (str (hbr*output-dir) "/" file-name)
         table-maps (read-clojure-lines-from file)]
     (hydrate-table-maps *HBaseAdmin* table-maps)))
-
-(defn table-exists? [table-name]
-  (not (nil? (some #(= table-name %) (list-all-tables)))))
 
 (defn count-region [htable start-key end-key]
   (let [descriptor (.getTableDescriptor htable)
