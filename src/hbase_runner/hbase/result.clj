@@ -38,7 +38,7 @@
     (pprint {(row-id-for result)
              (all-result-cols-to-map result)})))
 
-(defn results-to-map [results columns {:keys [limit print-only]}]
+(defn results-to-map [results {:keys [limit print-only]}]
   (let [limited-results (limit-results limit results)]
     (if print-only
       (print-scan limited-results)
