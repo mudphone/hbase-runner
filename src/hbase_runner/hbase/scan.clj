@@ -110,5 +110,5 @@
            columns (columns-from-coll-or-str columns)
            scan (scan-for-columns start-row stop-row columns scan-options)
            scanner (.getScanner (hbase-table table-name) scan)]
-       (results-to-map (seq scanner) columns print-options)
+       (results-to-map (seq scanner) print-options)
        )))
