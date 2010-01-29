@@ -41,7 +41,13 @@
 (defn- set-timestamp [scan timestamp]
   (.setTimeStamp scan (long timestamp)))
 
-(defn scan-gen [{:keys [scan start-row stop-row columns filter timestamp cache]
+(defn- set-max-versions [scan versions]
+  (cond
+   (= :all versions) (.setMaxVersions scan)
+   :else (.setMaxVersions scan versions)))
+
+(defn scan-gen [{:keys [scan start-row stop-row columns filter timestamp cache
+                        versions]
                  :or {scan (Scan.)
                       cache true}}]
   "Create a new scan, or update a scan if passed as :scan argument.
@@ -53,6 +59,7 @@
             (update-if-input #(add-cols-to-scan %1 %2) columns)
             (update-if-input #(set-filter %1 %2) filter)
             (update-if-input #(set-timestamp %1 %2) timestamp)
+            (update-if-input #(set-max-versions %1 %2) versions)
             )]
     (.setCacheBlocks scan cache)
     scan))
@@ -83,7 +90,8 @@
      (scan-table table-name {}))
 
   ([table-name {:keys [start-row stop-row columns
-                       limit filter timestamp cache print-only]
+                       limit filter timestamp cache print-only
+                       versions]
                 :or {limit -1
                      filter nil
                      start-row ""
@@ -91,10 +99,12 @@
                      timestamp nil
                      columns nil
                      cache true
-                     print-only true}}]
+                     print-only true
+                     versions 1}}]
      (let [scan-options {:filter filter
                          :timestamp timestamp
-                         :cache cache}
+                         :cache cache
+                         :versions versions}
            print-options {:print-only print-only
                           :limit limit}
            columns (columns-from-coll-or-str columns)

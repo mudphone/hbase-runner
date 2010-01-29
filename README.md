@@ -152,7 +152,7 @@ That is, provided you have your config/connections.clj in order.
 
 While in the REPL...
 
-  Create a connection to HBase...
+#### Create a connection to HBase...
   If you want to work with all tables:
       user=> (start-hbase-repl)
 
@@ -161,16 +161,19 @@ While in the REPL...
       ;; the following would force most commands to only work with tables
       ;; beginning with "koba_development_"
 
+#### List tables...
   This prints all HBase tables:
       user=> (list-all-tables)
 
   This prints all HBase tables in your "namespace".
       user=> (list-tables)
 
+#### Show HBase-Runner settings...
   Print system settings, such as table-ns, selected system, and
   HBASE_RUNNER_HOME:
       user=> (print-current-settings)
 
+#### Truncate Tables...
   To truncate tables in parallel:
       user=> (def result (truncate-tables list-o-tables))
       ;; where "list-o-talbes" is a list of tables that you've def-ed somewhere.
@@ -201,8 +204,30 @@ To re-create the first table with an error (assuming it was dropped):
     ... output with errors ...
     user=> (create-table-from (:descriptor (first (:errors result))))
 
+If that makes your brain hurt, you can use "truncate-tables!" to do all this in a loop.  
 
-The current public API includes:
+#### Scan tables...
+  To scan tables you have two options.  Option #1 is to print the results to screen, but not return them.  This will ensure that, if your result set is large, you do not blow the heap:
+      user=> (scan "table-name")
+
+  Option #2 is to return the results of the scan as a list of result maps.  Note the ! at the end of "scan!":
+      user=> (scan! "table-name")
+
+  You can also pass options to either of these scan functions.  For example
+      ; Scan for all versions of cells (defaults to 1):
+      user=> (scan "table-name" {:versions :all})
+
+      ; Limit scan results to a number of records (defaults to all):
+      user=> (scan "table-name" {:limit 10})
+
+      ; Only scan certain column families, column qualifiers:
+      user=> (scan "table-name" {:columns "f1"})
+      user=> (scan "table-name" {:columns "f1:q1})
+      user=> (scan "table-name" {:columns ["f1" "f2"]})
+      ; WARNING: The column option is not working as expected right now.
+
+
+#### The current public API includes:
     count-rows [table-name]
     count-tables [table-names]
     create-missing-results-tables
