@@ -83,9 +83,8 @@
      (scan-table table-name {}))
 
   ([table-name {:keys [start-row stop-row columns
-                       limit max-length filter timestamp cache print-only]
+                       limit filter timestamp cache print-only]
                 :or {limit -1
-                     max-length -1
                      filter nil
                      start-row ""
                      stop-row nil
@@ -93,8 +92,7 @@
                      columns nil
                      cache true
                      print-only true}}]
-     (let [scan-options {:max-length max-length
-                         :filter filter
+     (let [scan-options {:filter filter
                          :timestamp timestamp
                          :cache cache}
            print-options {:print-only print-only
