@@ -148,11 +148,11 @@ You should then be able to:
 That is, provided you have your config/connections.clj in order.
 
 
-### In General
+## In General
 
 While in the REPL...
 
-#### Create a connection to HBase...
+### Create a connection to HBase...
   If you want to work with all tables:
       user=> (start-hbase-repl)
 
@@ -161,19 +161,19 @@ While in the REPL...
       ;; the following would force most commands to only work with tables
       ;; beginning with "koba_development_"
 
-#### List tables...
+### List tables...
   This prints all HBase tables:
       user=> (list-all-tables)
 
   This prints all HBase tables in your "namespace".
       user=> (list-tables)
 
-#### Show HBase-Runner settings...
+### Show HBase-Runner settings...
   Print system settings, such as table-ns, selected system, and
   HBASE_RUNNER_HOME:
       user=> (print-current-settings)
 
-#### Truncate Tables...
+### Truncate Tables...
   To truncate tables in parallel:
       user=> (def result (truncate-tables list-o-tables))
       ;; where "list-o-talbes" is a list of tables that you've def-ed somewhere.
@@ -206,7 +206,7 @@ To re-create the first table with an error (assuming it was dropped):
 
 If that makes your brain hurt, you can use "truncate-tables!" to do all this in a loop.  
 
-#### Scan tables...
+### Scan tables...
   To scan tables you have two options.  Option #1 is to print the results to screen, but not return them.  This will ensure that, if your result set is large, you do not blow the heap:
       user=> (scan "table-name")
 
@@ -224,10 +224,9 @@ If that makes your brain hurt, you can use "truncate-tables!" to do all this in 
       user=> (scan "table-name" {:columns "f1"})
       user=> (scan "table-name" {:columns "f1:q1})
       user=> (scan "table-name" {:columns ["f1" "f2"]})
-      ; WARNING: The column option is not working as expected right now.
 
 
-#### The current public API includes:
+### The current public API includes:
     count-rows [table-name]
     count-tables [table-names]
     create-missing-results-tables
@@ -287,18 +286,19 @@ Enjoy!
 
 # Thanks go to:
 
-Amit Rathore (#amitrathore) - Much code was taken from his clojure utils.
-Clojure Contrib Authors - I borrowed and stole much.
+- Amit Rathore (#amitrathore) - Much code was taken from his clojure utils.
+- Clojure Contrib Authors - I borrowed and stole much.
 
 For keeping our HBase up and getting us up to the required number of nodes:
-  * Siva Jagadeesan (#sivajag)
-  * Robert J. Berger (#rberger)
+- Siva Jagadeesan (#sivajag)
+- Robert J. Berger (#rberger)
 
 HBase Team:
 For tons of help on IRC:
-  * Michael Stack (#St^Ack)
-  * Ryan Rawson (#dj_ryan)
-  * J-D Cryans (#jdcryans)
+- Michael Stack (#St^Ack)
+- Ryan Rawson (#dj_ryan)
+- J-D Cryans (#jdcryans)
+- And all other HBase committers and contributors not mentioned here.
 
 You can find me logged in as #mudphone.
 
