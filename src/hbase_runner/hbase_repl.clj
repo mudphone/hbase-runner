@@ -4,9 +4,7 @@
   (:import [org.apache.hadoop.hbase.client HTable])
   (:require [clojure.contrib [str-utils :as str-utils]])
   (:use [clojure.contrib.pprint :only [pp pprint]])
-  (:use hbase-runner.hbase.region)
-  (:use hbase-runner.hbase.scan)
-  (:use hbase-runner.hbase.table)
+  (:use [hbase-runner.hbase put region scan table])
   (:use hbase-runner.utils.clojure)
   (:use hbase-runner.utils.config)
   (:use hbase-runner.utils.file)
@@ -309,14 +307,25 @@
 (defn disable-region [region-name]
   (online region-name true))
 
-(defn scan!
+(defn scan-results
   "Return results of scan (which may use a lot of memory).
    See 'scan' for print-only version of this function."
   ([table-name]
-     (scan! table-name {}))
+     (scan-results table-name {}))
   ([table-name options]
      (scan-table table-name (merge options {:print-only false}))))
 
 (defn scan [ & args ]
   "Print results of scan, but do not return them (to avoid using memory)."
   (apply scan-table args))
+
+(defn put
+  ([table-name row-id column value]
+     (put table-name row-id column value nil))
+  ([table-name row-id column value timestamp]
+     (let [htable (hbase-table table-name)
+           [family qualifier] (str-utils/re-split #":" column 2)
+           column-and-value [(.getBytes family)
+                             (.getBytes (or qualifier ""))
+                             (.getBytes value)]]
+       (.put htable (put-for-row row-id [column-and-value] timestamp)))))

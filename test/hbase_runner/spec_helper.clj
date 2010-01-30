@@ -1,12 +1,14 @@
 (ns hbase-runner.spec-helper
   (:require [clojure.contrib.java-utils :as java-utils])
-  (:import [org.apache.hadoop.hbase HTableDescriptor])
+  (:import [org.apache.hadoop.hbase HColumnDescriptor HTableDescriptor])
   (:use hbase-runner.hbase-repl)
   (:use hbase-runner.utils.config))
 
 (defn create-table-if-does-not-exist [table-name]
   (if-not (table-exists? table-name)
-    (let [table-descriptor (HTableDescriptor. table-name)]
+    (let [table-descriptor (HTableDescriptor. table-name)
+          col-descriptor (HColumnDescriptor. (.getBytes "f1"))]
+      (.addFamily table-descriptor col-descriptor)
       (.createTable *HBaseAdmin* table-descriptor)
       (println "Created table" table-name))))
 

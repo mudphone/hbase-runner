@@ -1,6 +1,6 @@
 (ns hbase-runner.hbase-repl-spec
   (:require [clojure.contrib.java-utils :as java-utils])
-  (:use [clojure.test :only [run-tests deftest is]])
+  (:use [clojure.test :only [deftest is run-tests testing]])
   (:use hbase-runner.spec-helper)
   (:use hbase-runner.hbase-repl)
   (:use hbase-runner.utils.config)
@@ -51,4 +51,22 @@
         (is (= "hbr_spec_t1" (:name
                               (first
                                (read-clojure-lines-from test-file-path))))))
-)))
+      )))
+
+(deftest put-test
+  (let [table-name (ns-table-name :t1)]
+    (with-test-tables [table-name]
+      (truncate-table table-name)
+      (testing "put, with default timestamp version"
+        (put table-name, "test-row-id1", "f1", "123")
+        (let [results (scan-results table-name)
+              result (first results)]
+          (is (= 1 (count results)))
+          (is (= "123" (ffirst (vals (get-in result ["test-row-id1" "f1" ""])))))))
+
+      (testing "put, with custom timestamp version"
+        (put table-name, "test-row-id2", "f1", "456" (long 111222333))
+        (let [results (scan-results table-name)
+              result (second results)]
+          (is (= 2 (count results)))
+          (is (= "456" (first (get-in result ["test-row-id2" "f1" "" (long 111222333)])))))))))
