@@ -319,13 +319,23 @@
   "Print results of scan, but do not return them (to avoid using memory)."
   (apply scan-table args))
 
+(defn- col-val-entry-to-vec [col-val-entry]
+  (let [column (first col-val-entry)
+        value (second col-val-entry)
+        [family qualifier] (str-utils/re-split #":" column 2)]
+    [(.getBytes family) (.getBytes (or qualifier "")) (.getBytes value)]
+    ))
+
+(defn put-cols
+  ([table-name row-id col-val-map]
+     (put-cols table-name row-id col-val-map nil))
+  ([table-name row-id col-val-map timestamp]
+     (let [htable (hbase-table table-name)
+           col-val-vec (map col-val-entry-to-vec col-val-map)]
+       (.put htable (put-for-row row-id col-val-vec timestamp)))))
+
 (defn put
   ([table-name row-id column value]
      (put table-name row-id column value nil))
   ([table-name row-id column value timestamp]
-     (let [htable (hbase-table table-name)
-           [family qualifier] (str-utils/re-split #":" column 2)
-           column-and-value [(.getBytes family)
-                             (.getBytes (or qualifier ""))
-                             (.getBytes value)]]
-       (.put htable (put-for-row row-id [column-and-value] timestamp)))))
+     (put-cols table-name row-id {column value} timestamp)))
