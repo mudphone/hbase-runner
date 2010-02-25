@@ -58,11 +58,23 @@
       (alter *hbase-runner-config* assoc :system system))
      (print-current-settings)))
 
+(def start-hbase-runner start-hbase-repl)
+
 (defn list-all-tables []
   (map table-name-from (all-htable-descriptors)))
 
+(defn list-all-tables-pp []
+  (let [tables (list-all-tables)]
+    (pprint tables)
+    tables))
+
 (defn list-tables []
   (filter (partial is-in-table-ns (current-table-ns)) (list-all-tables)))
+
+(defn list-tables-pp []
+  (let [tables (list-tables)]
+    (pprint tables)
+    tables))
 
 (defn find-all-tables [search-str]
   (filter-names-by search-str (list-all-tables)))
@@ -226,9 +238,9 @@
       (dorun (enable-disabled-results-tables all-results))
       (package-results all-results))))
 
-(defn truncate-tables!
+(defn truncate-tables-loop
   ([tables]
-     (truncate-tables! tables 1))
+     (truncate-tables-loop tables 1))
   ([tables iteration-count]
      (println "Begin iteration" iteration-count)
      (enable-tables tables)
