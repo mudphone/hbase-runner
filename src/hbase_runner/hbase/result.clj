@@ -1,5 +1,7 @@
 (ns hbase-runner.hbase.result
-  (:use [clojure.contrib.pprint :only [pprint]])
+  (:use [clojure.contrib
+         [pprint :only [pprint]]
+         [str-utils :as str-utils]])
   (:use hbase-runner.utils.clojure))
 
 (defn- col-value [col result]
@@ -7,16 +9,6 @@
 
 (defn- assoc-result-col-value-to-map [result map col]
   (assoc map col (col-value col result)))
-
-(defn- result-column-values-to-map [result columns]
-  (reduce (partial assoc-result-col-value-to-map result) {} columns))
-
-(defn- row-id-for [result]
-  (byte-array-to-str (.getRow result)))
-
-(defn- limit-results [limit results]
-  (or (and limit (> limit 0) (take limit results))
-      results))
 
 (defn row-id-from-kv [kv]
   (String. (.getRow kv)))
@@ -32,6 +24,27 @@
 
 (defn value-from-kv [kv]
   (String. (.getValue kv)))
+
+(defn family-qualifier-from-kv [kv]
+  [(family-from-kv kv) (qualifier-from-kv kv)])
+
+(defn result-column-values-to-map
+  ([result]
+     (let [kvs (.raw result)
+           col-vecs (doall
+                     (map family-qualifier-from-kv kvs))
+           columns (doall
+                    (map #(str-utils/str-join ":" %) col-vecs))]
+       (result-column-values-to-map result columns)))
+  ([result columns]
+     (reduce (partial assoc-result-col-value-to-map result) {} columns)))
+
+(defn- row-id-for [result]
+  (byte-array-to-str (.getRow result)))
+
+(defn- limit-results [limit results]
+  (or (and limit (> limit 0) (take limit results))
+      results))
 
 (defn merge-kv-value [row-map kv]
   (let [map-keys [(family-from-kv kv) (qualifier-from-kv kv) (timestamp-from-kv kv)]

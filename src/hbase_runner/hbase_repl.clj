@@ -4,7 +4,7 @@
   (:import [org.apache.hadoop.hbase.client HTable])
   (:require [clojure.contrib [str-utils :as str-utils]])
   (:use [clojure.contrib.pprint :only [pp pprint]])
-  (:use [hbase-runner.hbase put region scan table])
+  (:use [hbase-runner.hbase get put region result scan table])
   (:use hbase-runner.utils.clojure)
   (:use hbase-runner.utils.config)
   (:use hbase-runner.utils.file)
@@ -351,3 +351,8 @@
      (put table-name row-id column value nil))
   ([table-name row-id column value timestamp]
      (put-cols table-name row-id {column value} timestamp)))
+
+(defn get-row
+  [table-name row-id columns]
+  (let [htable (hbase-table table-name)]
+   (result-column-values-to-map (.get htable (get-for row-id columns)))))

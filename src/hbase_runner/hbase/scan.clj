@@ -1,8 +1,6 @@
 (ns hbase-runner.hbase.scan
   (:import [org.apache.hadoop.hbase.client Scan])
-  (:use [clojure.contrib.str-utils :only [re-split str-join]])
-  (:use hbase-runner.hbase.result)
-  (:use hbase-runner.hbase.table))
+  (:use (hbase-runner.hbase column result table)))
 
 (defn- columns-from-coll-or-str [columns]
   (cond
@@ -14,7 +12,7 @@
                       " column, or a collection of columns.")))))
 
 (defn- add-family-qualifier-to [scan col-str]
-  (let [col-qual (map #(.getBytes %1) (re-split #":" col-str 2))]
+  (let [col-qual (col-qual-from-col-str col-str)]
     (if (= (count col-qual) 2)
       (apply #(.addColumn scan %1 %2) col-qual)
       (apply #(.addFamily scan %1) col-qual))))
