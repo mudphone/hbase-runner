@@ -2,15 +2,6 @@
   (:import [org.apache.hadoop.hbase.client Scan])
   (:use (hbase-runner.hbase column result table)))
 
-(defn- columns-from-coll-or-str [columns]
-  (cond
-   (nil? columns) nil
-   (coll? columns) columns
-   (string? columns) [columns]
-   :else (throw (Exception.
-                 (str ":columns must be specified as a single string"
-                      " column, or a collection of columns.")))))
-
 (defn- add-family-qualifier-to [scan col-str]
   (let [col-qual (col-qual-from-col-str col-str)]
     (if (= (count col-qual) 2)
@@ -21,11 +12,16 @@
   (reduce add-family-qualifier-to scan cols))
 
 (defn- empty-or-nil? [coll-or-symbol]
-  (or (and (coll? coll-or-symbol) (empty? coll-or-symbol)) (nil? coll-or-symbol)))
+  (or
+   (and (coll? coll-or-symbol) (empty? coll-or-symbol))
+   (nil? coll-or-symbol)))
 
 (defn- update-if-input [scan update-fn & input]
-  (or (and (not-empty (remove empty-or-nil? input)) (apply (partial update-fn scan) input))
-      scan))
+  (or
+   (and
+    (not-empty (remove empty-or-nil? input))
+    (apply (partial update-fn scan) input))
+   scan))
 
 (defn- set-start-row [scan start-row]
   (.setStartRow scan (.getBytes start-row)))

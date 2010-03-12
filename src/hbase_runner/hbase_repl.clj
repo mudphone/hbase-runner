@@ -4,7 +4,7 @@
   (:import [org.apache.hadoop.hbase.client HTable])
   (:require [clojure.contrib [str-utils :as str-utils]])
   (:use [clojure.contrib.pprint :only [pp pprint]])
-  (:use [hbase-runner.hbase get put region result scan table])
+  (:use [hbase-runner.hbase column get put region result scan table])
   (:use hbase-runner.utils.clojure)
   (:use hbase-runner.utils.config)
   (:use hbase-runner.utils.file)
@@ -327,16 +327,10 @@
   ([table-name options]
      (scan-table table-name (merge options {:print-only false}))))
 
-(defn scan [ & args ]
+(defn scan
   "Print results of scan, but do not return them (to avoid using memory)."
+  [ & args ]
   (apply scan-table args))
-
-(defn- col-val-entry-to-vec [col-val-entry]
-  (let [column (first col-val-entry)
-        value (second col-val-entry)
-        [family qualifier] (str-utils/re-split #":" column 2)]
-    [(.getBytes family) (.getBytes (or qualifier "")) (.getBytes value)]
-    ))
 
 (defn put-cols
   ([table-name row-id col-val-map]
@@ -353,6 +347,35 @@
      (put-cols table-name row-id {column value} timestamp)))
 
 (defn get-row
-  [table-name row-id columns]
-  (let [htable (hbase-table table-name)]
-   (result-column-values-to-map (.get htable (get-for row-id columns)))))
+  "Returns row as Clojure map, by table-name, row-id, and timestamp.
+   An option hash may be provided as the optional 3rd argument.
+   Options: {
+             :column \"f1\"
+             :columns [ \"f1\" \"f2:q1\" ]
+             :timestamp 1268279340489
+             :timestamps [ 1268279340488 1268279340489 ]
+            }
+     column  - family:qualifier for single column
+     columns - a vector of family:qualifier strings
+     timestamp  - a single timestamp long
+                  gets only values with this timestamp
+     timestamps - a vector of min and max timestamp longs
+                  gets all values for selected columns in this range"
+  ([table-name row-id]
+     )
+  ([table-name row-id {:keys [column columns timestamp timestamps]
+                       :or {column nil
+                            columns nil
+                            timestamp nil
+                            timestamps []}}]
+     (let [htable (hbase-table table-name)
+           the-get (-> (hbase-get row-id)
+                       (add-get-cols (columns-from-coll-or-str column))
+                       (add-get-cols columns)
+                       (add-get-ts timestamp)
+                       (add-get-ts timestamps)
+                       )]
+       (result-column-values-to-map (.get htable the-get))
+       )
+     )
+  )
