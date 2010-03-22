@@ -327,6 +327,8 @@
   ([table-name options]
      (scan-table table-name (merge options {:print-only false}))))
 
+(def scan-result scan-results)
+
 (defn scan
   "Print results of scan, but do not return them (to avoid using memory)."
   [ & args ]
