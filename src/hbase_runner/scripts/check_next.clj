@@ -53,21 +53,26 @@
 
 (defn result-summary-for [found-row-id table-name]
   {:table table-name
-   :last-row-id found-row-id
+   :found-row-id found-row-id
    :date (pretty-date-for (timestamp-from found-row-id))
    })
 
 (defn pp-result-summary-for [found-row-id table-name]
-  (pprint
-   (result-summary-for found-row-id table-name)))
+  (let [result (result-summary-for found-row-id table-name)]
+    (pprint result)
+    result))
+
+(defn result-for [start-row-id stop-row-id events-table]
+  (-> (last-row-between start-row-id
+                        stop-row-id
+                        events-table)
+      (pp-result-summary-for events-table)))
 
 (defn last-row-between-for [start-row-id stop-row-id]
   (println "Given last possible row-id timstamp start-row:"
            (pretty-date-for (timestamp-from start-row-id))
            "and stop-row:"
            (pretty-date-for (timestamp-from stop-row-id)))
-  (doseq [events-table consumer-events-tables]
-    (-> (last-row-between start-row-id
-                          stop-row-id
-                          events-table)
-        (pp-result-summary-for events-table))))
+  (sort-by :found-row-id
+           (pmap (partial result-for start-row-id stop-row-id)
+                 consumer-events-tables)))
