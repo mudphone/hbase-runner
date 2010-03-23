@@ -2,19 +2,25 @@
   (:import (java.text DateFormat SimpleDateFormat)
            (java.util TimeZone))
   (:use [clojure.contrib
-         [str-utils :as str-utils]]
+         [str-utils :as str-utils]
+         [pprint :as pprint]]
         (hbase-runner hbase-repl)))
 
 (def consumer-events-tables (find-tables "consumer_events_"))
+(def STUPID-TABLE
+     "furtive_production_consumer_events_93474cbf-69d9-b3b8-8b43-75fbb4d74296")
 
 (defn first-row-after [row-id table-name]
   ((comp first keys first)
-   (scan-results table-name {:start-row row-id :limit 1})))
+   (scan-results table-name {:start-row row-id
+                             :limit 1
+                             :columns ["meta:api__"]})))
 
 (defn last-row-between [start-row-id stop-row-id table-name]
   ((comp first keys last)
    (scan-results table-name {:start-row-id start-row-id
-                             :stop-row stop-row-id})))
+                             :stop-row stop-row-id
+                             :columns ["meta:api__"]})))
 
 (defn timestamp-from [row-id]
   (first (str-utils/re-split #":" (or row-id ""))))
@@ -45,21 +51,23 @@
                       }))
                  consumer-events-tables)))
 
+(defn result-summary-for [found-row-id table-name]
+  {:table table-name
+   :last-row-id found-row-id
+   :date (pretty-date-for (timestamp-from found-row-id))
+   })
 
+(defn pp-result-summary-for [found-row-id table-name]
+  (pprint
+   (result-summary-for found-row-id table-name)))
 
 (defn last-row-between-for [start-row-id stop-row-id]
   (println "Given last possible row-id timstamp start-row:"
            (pretty-date-for (timestamp-from start-row-id))
            "and stop-row:"
            (pretty-date-for (timestamp-from stop-row-id)))
-  (sort-by :last-row-id
-           (pmap (fn [table-name]
-                   (let [last-row-id (last-row-between start-row-id
-                                                       stop-row-id
-                                                       table-name)]
-                     {:table table-name
-                      :last-row-id last-row-id
-                      :date (pretty-date-for (timestamp-from last-row-id))
-                      }))
-                 consumer-events-tables))
-  )
+  (doseq [events-table consumer-events-tables]
+    (-> (last-row-between start-row-id
+                          stop-row-id
+                          events-table)
+        (pp-result-summary-for events-table))))
