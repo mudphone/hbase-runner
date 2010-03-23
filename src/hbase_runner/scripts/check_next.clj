@@ -74,5 +74,5 @@
            "and stop-row:"
            (pretty-date-for (timestamp-from stop-row-id)))
   (sort-by :found-row-id
-           (pmap (partial result-fr start-row-id stop-row-id)
+           (pmap (partial result-for start-row-id stop-row-id)
                  consumer-events-tables)))
