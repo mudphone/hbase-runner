@@ -11,6 +11,11 @@
   ((comp first keys first)
    (scan-results table-name {:start-row row-id :limit 1})))
 
+(defn last-row-between [start-row-id stop-row-id table-name]
+  ((comp first keys last)
+   (scan-results table-name {:start-row-id start-row-id
+                             :stop-row stop-row-id})))
+
 (defn timestamp-from [row-id]
   (first (str-utils/re-split #":" (or row-id ""))))
 
@@ -31,7 +36,7 @@
 (defn next-rows-for [row-id]
   (println "Given start row-id timestamp is:"
            (pretty-date-for (timestamp-from row-id)))
-  (sort-by :date
+  (sort-by :next-row-id
            (pmap (fn [table-name]
                    (let [next-row-id (first-row-after row-id table-name)]
                      {:table table-name
@@ -39,3 +44,22 @@
                       :date (pretty-date-for (timestamp-from next-row-id))
                       }))
                  consumer-events-tables)))
+
+
+
+(defn last-row-between-for [start-row-id stop-row-id]
+  (println "Given last possible row-id timstamp start-row:"
+           (pretty-date-for (timestamp-from start-row-id))
+           "and stop-row:"
+           (pretty-date-for (timestamp-from stop-row-id)))
+  (sort-by :last-row-id
+           (pmap (fn [table-name]
+                   (let [last-row-id (last-row-between start-row-id
+                                                       stop-row-id
+                                                       table-name)]
+                     {:table table-name
+                      :last-row-id last-row-id
+                      :date (pretty-date-for (timestamp-from last-row-id))
+                      }))
+                 consumer-events-tables))
+  )
