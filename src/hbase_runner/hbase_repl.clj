@@ -364,7 +364,7 @@
      timestamps - a vector of min and max timestamp longs
                   gets all values for selected columns in this range"
   ([table-name row-id]
-     )
+     (get-row table-name row-id {}))
   ([table-name row-id {:keys [column columns timestamp timestamps]
                        :or {column nil
                             columns nil
