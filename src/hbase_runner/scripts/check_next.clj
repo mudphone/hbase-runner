@@ -31,10 +31,11 @@
 (defn next-rows-for [row-id]
   (println "Given start row-id timestamp is:"
            (pretty-date-for (timestamp-from row-id)))
-  (pmap (fn [table-name]
-          (let [next-row-id (first-row-after row-id table-name)]
-           {:table table-name
-            :next-row-id next-row-id
-            :date (pretty-date-for (timestamp-from next-row-id))
-            }))
-        consumer-events-tables))
+  (sort-by :date
+           (pmap (fn [table-name]
+                   (let [next-row-id (first-row-after row-id table-name)]
+                     {:table table-name
+                      :next-row-id next-row-id
+                      :date (pretty-date-for (timestamp-from next-row-id))
+                      }))
+                 consumer-events-tables)))
