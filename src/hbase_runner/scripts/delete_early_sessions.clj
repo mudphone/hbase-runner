@@ -7,7 +7,7 @@
 
 (def SESSION-STREAM-TABLE "koba_development_session_event_stream")
 (def SESSION-SCAN-BATCH-SIZE 1000)
-(def CUTOFF-TS "1256840968518") ;; Cutoff: Thu Oct 29 18:29:28 UTC 2009
+(def CUTOFF-TS 1256840968518) ;; Cutoff: Thu Oct 29 18:29:28 UTC 2009
 
 ;; SHOULD BE ADDED TO MAIN API
 (defn simple-delete-row [hbase-table-name row-id]
@@ -26,14 +26,15 @@
   (apply concat (vals (get-in (first (vals session-map)) ["consumer_event" "id"]))))
 
 (defn last-event-id-of [session-map]
-  (last (sort (event-ids-of session-map))))
+  (last (sort
+         (map #(Long/parseLong (timestamp-from %))
+              (event-ids-of session-map)))))
 
 (defn delete-session-if-below-cutoff [session-map]
-  (let [last-event-id (last-event-id-of session-map)]
-    (if (< (Long/parseLong (timestamp-from last-event-id))
-           (Long/parseLong CUTOFF-TS))
+  (let [last-event-id-ts (last-event-id-of session-map)]
+    (if (< last-event-id-ts CUTOFF-TS)
       (let [session-id (session-id-of session-map)]
-        (println "deleting session:" session-id " last-event-id:" last-event-id)
+        (println "deleting session:" session-id " last-event-id:" last-event-id-ts)
         (simple-delete-row SESSION-STREAM-TABLE session-id)
         ))))
 
