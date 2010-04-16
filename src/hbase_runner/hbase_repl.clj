@@ -344,6 +344,8 @@
   ([table-name row-id column value timestamp]
      (put-cols table-name row-id {column value} timestamp)))
 
+(def put-row put)
+
 (defn get-row
   "Returns row as Clojure map, by table-name, row-id, and timestamp.
    An option hash may be provided as the optional 3rd argument.
@@ -378,8 +380,14 @@
      )
   )
 
-(defn delete-row
+(defn delete-all-row
   "Performs a simple delete of an entire HBase table row."
   [table-name row-id]
   (simple-delete-row table-name row-id)
   )
+
+;; (defn delete-row
+;;   ([table-name row-id column value]
+;;      (delete-row-at table-name row-id column value nil))
+;;   ([table-name row-id column value timestamp]
+;;      (delete-row-at table-name row-id {column value} timestamp)))
