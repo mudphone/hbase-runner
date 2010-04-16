@@ -386,8 +386,48 @@
   (simple-delete-row table-name row-id)
   )
 
-;; (defn delete-row
-;;   ([table-name row-id column value]
-;;      (delete-row-at table-name row-id column value nil))
-;;   ([table-name row-id column value timestamp]
-;;      (delete-row-at table-name row-id {column value} timestamp)))
+(def delete-row delete-all-row)
+(def deleteall-row delete-all-row)
+(def deleteall delete-all-row)
+
+(defn delete-cols-up-to
+  "Delete columns up to a given timestamp.
+   If no timestamp given, delete all versions of given columns."
+  ([table-name row-id columns value]
+     (delete-cols-up-to* table-name row-id columns nil))
+  ([table-name row-id columns value timestamp]
+     (delete-cols-up-to* table-name row-id columns timestamp)))
+
+(defn delete-col-up-to
+  "Delete column up to a given timestamp.
+   If no timestamp given, delete all versions of given column."
+  ([table-name row-id column value]
+     (delete-cols-up-to* table-name row-id [column] nil))
+  ([table-name row-id column value timestamp]
+     (delete-cols-up-to* table-name row-id [column] timestamp)))
+
+(defn delete-cols-all-versions
+  "Delete all versions of given columns."
+  [table-name row-id columns value]
+  (delete-cols-up-to* table-name row-id columns nil))
+
+(defn delete-col-all-versions
+  "Delete all versions of given column."
+  [table-name row-id column value]
+  (delete-cols-up-to* table-name row-id [column] nil))
+
+(defn delete-cols-at
+  "Delete columns at given timestamp.
+   If no timestamp given, delete latest version of given columns."
+  ([table-name row-id columns value]
+     (delete-cols-at* table-name row-id columns nil))
+  ([table-name row-id columns value timestamp]
+     (delete-cols-at* table-name row-id columns timestamp)))
+
+(defn delete-col-at
+  "Delete column at given timestamp.
+   If no timestamp given, delete latest version of given column."
+  ([table-name row-id column value]
+     (delete-cols-at* table-name row-id [column] nil))
+  ([table-name row-id column value timestamp]
+     (delete-cols-at* table-name row-id [column] timestamp)))

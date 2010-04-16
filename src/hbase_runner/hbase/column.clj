@@ -14,9 +14,15 @@
                  (str ":columns must be specified as a single string"
                       " column, or a collection of columns.")))))
 
+(defn family-qualifier-from-column
+  "Split column name into column family and qualifier: [family qualifier]"
+  [column-name]
+  (str-utils/re-split #":" column-name 2)
+  )
+
 (defn col-val-entry-to-vec [col-val-entry]
   (let [column (first col-val-entry)
         value (second col-val-entry)
-        [family qualifier] (str-utils/re-split #":" column 2)]
+        [family qualifier] (family-qualifier-from-column column)]
     [(.getBytes family) (.getBytes (or qualifier "")) (.getBytes value)]
     ))
