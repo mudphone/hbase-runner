@@ -393,41 +393,41 @@
 (defn delete-cols-up-to
   "Delete columns up to a given timestamp.
    If no timestamp given, delete all versions of given columns."
-  ([table-name row-id columns value]
+  ([table-name row-id columns]
      (delete-cols-up-to* table-name row-id columns nil))
-  ([table-name row-id columns value timestamp]
+  ([table-name row-id columns timestamp]
      (delete-cols-up-to* table-name row-id columns timestamp)))
 
 (defn delete-col-up-to
   "Delete column up to a given timestamp.
    If no timestamp given, delete all versions of given column."
-  ([table-name row-id column value]
+  ([table-name row-id column]
      (delete-cols-up-to* table-name row-id [column] nil))
-  ([table-name row-id column value timestamp]
+  ([table-name row-id column timestamp]
      (delete-cols-up-to* table-name row-id [column] timestamp)))
 
 (defn delete-cols-all-versions
   "Delete all versions of given columns."
-  [table-name row-id columns value]
+  [table-name row-id columns]
   (delete-cols-up-to* table-name row-id columns nil))
 
 (defn delete-col-all-versions
   "Delete all versions of given column."
-  [table-name row-id column value]
+  [table-name row-id column]
   (delete-cols-up-to* table-name row-id [column] nil))
 
 (defn delete-cols-at
   "Delete columns at given timestamp.
    If no timestamp given, delete latest version of given columns."
-  ([table-name row-id columns value]
+  ([table-name row-id columns]
      (delete-cols-at* table-name row-id columns nil))
-  ([table-name row-id columns value timestamp]
+  ([table-name row-id columns timestamp]
      (delete-cols-at* table-name row-id columns timestamp)))
 
 (defn delete-col-at
   "Delete column at given timestamp.
    If no timestamp given, delete latest version of given column."
-  ([table-name row-id column value]
+  ([table-name row-id column]
      (delete-cols-at* table-name row-id [column] nil))
-  ([table-name row-id column value timestamp]
+  ([table-name row-id column timestamp]
      (delete-cols-at* table-name row-id [column] timestamp)))
