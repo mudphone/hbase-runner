@@ -1,16 +1,12 @@
 (ns hbase-runner.hbase-repl
-  (:import [java.io File])
-  (:import [org.apache.hadoop.hbase HConstants])
-  (:import [org.apache.hadoop.hbase.client HTable])
+  (:import [java.io File]
+           [org.apache.hadoop.hbase HConstants]
+           [org.apache.hadoop.hbase.client HTable])
   (:require [clojure.contrib [str-utils :as str-utils]])
-  (:use [clojure.contrib.pprint :only [pp pprint]])
-  (:use [hbase-runner.hbase column get put region result scan table])
-  (:use hbase-runner.utils.clojure)
-  (:use hbase-runner.utils.config)
-  (:use hbase-runner.utils.file)
-  (:use hbase-runner.utils.find)
-  (:use hbase-runner.utils.create)
-  (:use hbase-runner.utils.truncate))
+  (:use [clojure.contrib.pprint :only [pp pprint]]
+        [hbase-runner.hbase column delete get put region result scan table]
+        (hbase-runner.utils clojure config file find create truncate))
+  )
 
 (defn set-current-table-ns [current-ns]
   (dosync
@@ -380,4 +376,10 @@
        (result-column-values-to-map (.get htable the-get))
        )
      )
+  )
+
+(defn delete-row
+  "Performs a simple delete of an entire HBase table row."
+  [table-name row-id]
+  (simple-delete-row table-name row-id)
   )
