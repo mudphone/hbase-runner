@@ -2,6 +2,7 @@
 *#*
 .classpath
 .project
+lib/*
 logs/*
 output/*
 lib/hbase-site.xml
