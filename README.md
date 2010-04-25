@@ -3,19 +3,25 @@
 This is the beginnings of a tiny utility library for working with HBase in the
 REPL.
 
-Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
+Author: Kyle Oba ;; mudphone ;; koba <!!asterisk> mudphone.com
 
 # QUICK START:
 
 1. clone the repo
-2. execute this command from the repo root:
+2. install leiningen (the Clojure dependency manager thingy):
+   http://github.com/technomancy/leiningen
+3. go to project root dir
+       $ cd hbase-runner
+4. install dependencies
+       $ lein deps
+5. execute this command from the project root dir:
        $ ./hbase-repl.sh
-3. connect with this command:
+6. connect with this command:
        user=> (start-hbase-repl)
-4. do stuff, like list all tables:
+7. do stuff, like list all tables:
        user=> (list-all-tables)
-5. see below for comprehensive set-up instructions...
-6. explore!
+8. see below for comprehensive set-up instructions...
+9. explore!
 
 
 # PROJECT GOALS:
@@ -25,11 +31,7 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
 
 
 # What's new:
-- Now using HBase 0.20.2 for active development.
-
-  * NOTE: You can use this with 0.20.0-1, you just have to replace the hbase
-  and zk jars in lib/java with the proper versions.  It's that simple AFAIK.
-  YMMV.
+- Now using HBase 0.20.3 for active development.
 
 - Connections to HBase are now configured via the config/connections.clj file.
   This is basically a Clojure map with connection settings.  This means that
@@ -54,12 +56,6 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
   4. If that doesn't work for you, you can copy the .clj_completions.sample file
      to ~/.clj_completions
 
-- Truncating tables in a pmap is great because it's fast.  However, since the
-  truncate calls are executed in agents, the output of the command is not seen.
-  The truncate-tables command set up to return a list of maps, which are keyed
-  with either :truncated or :error.  There is one map per truncated table.
-  This return structure allows you to see if everything ran as expected.
-
 - There's a test suite.  But, it's not comprehensive yet.  To run it, do this:
 
   1. Running tests from the command-line:
@@ -79,20 +75,6 @@ Author: Kyle Oba ;; mudphone ;; koba <zat-yo> mudphone.com
            C-c C-,
      - errors will be hilighted in red, for details, move the point and press
            C-c C-'
-
-
-# KNOWN BUGS:
-- At times, the truncate-tables function will not properly recreate a table.
-  Be sure to save the result of your truncate-table(s) calls, like so:
-    $> (def result (truncate-tables list-o-tables))
-  "result" will now contain a helpful map of the tables and their statuses.
-  If there was error, you can enable/disable, or use the included HTable
-  descriptor to re-create the table.
-
-  Use (:errors result) on the result of truncate-tables to find tables with
-  errors.
-
-  NOTE: This seems to be less of a problem with HBase 0.20.2.
 
 
 # Instructions for use:
@@ -148,6 +130,14 @@ You should then be able to:
 That is, provided you have your config/connections.clj in order.
 
 
+### Via Leiningen REPL
+
+For a simple, unadorned REPL, you can use the Leiningen REPL command:
+    $ lein repl
+Note, you will have to "use" hbase-runner.hbase-repl and any other libraries
+that you wish to play with.
+
+
 ## In General
 
 While in the REPL...
@@ -176,7 +166,7 @@ While in the REPL...
 ### Truncate Tables...
   To truncate tables in parallel:
       user=> (def result (truncate-tables list-o-tables))
-      ;; where "list-o-talbes" is a list of tables that you've def-ed somewhere.
+      ;; where "list-o-tables" is a list of tables that you've def-ed somewhere.
 
   If, you are in the hbase-repl namespace, you can use pretty print:
       user=> (pp) ;; to see the last result
@@ -204,7 +194,7 @@ To re-create the first table with an error (assuming it was dropped):
     ... output with errors ...
     user=> (create-table-from (:descriptor (first (:errors result))))
 
-If that makes your brain hurt, you can use "truncate-tables!" to do all this in a loop.  
+If that makes your brain hurt, you can use "truncate-tables-loop" to do all this in a loop.  
 
 ### Scan tables...
   To scan tables you have two options.  Option #1 is to print the results to screen, but not return them.  This will ensure that, if your result set is large, you do not blow the heap:
@@ -222,16 +212,29 @@ If that makes your brain hurt, you can use "truncate-tables!" to do all this in 
 
       ; Only scan certain column families, column qualifiers:
       user=> (scan "table-name" {:columns "f1"})
-      user=> (scan "table-name" {:columns "f1:q1})
+      user=> (scan "table-name" {:columns "f1:q1"})
       user=> (scan "table-name" {:columns ["f1" "f2"]})
 
 
-### The current public API includes:
+### For the current public API:
+Type this at the REPL:
+    > (print-api)
+
+    close-region [region-name]
+    compact [table-or-region-name]
+    count-region [htable start-key end-key]
     count-rows [table-name]
     count-tables [table-names]
-    create-missing-results-tables
+    create-missing-results-tables [error-results]
     create-table-from [descriptor]
     current-table-ns []
+    delete-all-row
+    delete-col-all-versions
+    delete-col-at
+    delete-col-up-to
+    delete-cols-all-versions
+    delete-cols-at
+    delete-cols-up-to
     describe [table-name]
     disable-all-tables []
     disable-drop-table [table-name]
@@ -244,7 +247,7 @@ If that makes your brain hurt, you can use "truncate-tables!" to do all this in 
     drop-table [table-name]
     dump-tables
     enable-all-tables []
-    enable-disabled-results-tables [{all-results :all}]
+    enable-disabled-results-tables [all-results]
     enable-region [region-name]
     enable-table [table-name]
     enable-table-if-disabled [table-name]
@@ -253,22 +256,29 @@ If that makes your brain hurt, you can use "truncate-tables!" to do all this in 
     find-tables [search-str]
     flush-table [table-name]
     flush-table-or-region [table-name-or-region-name]
+    get-row
     hydrate-table-maps-from [file-name]
     list-all-tables []
+    list-all-tables-pp []
     list-tables []
+    list-tables-pp []
     major-compact [table-name-or-region-name]
+    optionally-create-missing-results-tables [{error-results :errors
+    optionally-enable-disabled-results-tables [{error-results :errors
     print-api []
     print-current-settings []
     public-api []
-    scan [ & args ]
-    scan!
+    put
+    put-cols
+    scan
+    scan-results
     set-current-table-ns [current-ns]
     start-hbase-repl
     table-disabled? [table-name]
     table-enabled? [table-name]
     table-exists? [table-name]
     truncate-tables [table-name-list]
-    truncate-tables!
+    truncate-tables-loop
 
 Enjoy!
 
