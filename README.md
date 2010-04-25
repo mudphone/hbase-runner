@@ -76,6 +76,13 @@ Author: Kyle Oba ;; mudphone ;; koba <!!asterisk> mudphone.com
      - errors will be hilighted in red, for details, move the point and press
            C-c C-'
 
+- clj-stacktrace is loaded via shell script.  So you have access to your last
+  stack trace in a pretty format:
+       > (pst)
+       > (pst+)  ; => same thing with color
+  You can also load this, if you're using Emacs SLIME:
+       > (use 'clj-stacktrace.repl)
+
 
 # Instructions for use:
 
