@@ -31,7 +31,7 @@ Author: Kyle Oba ;; mudphone ;; koba <!!asterisk> mudphone.com
 
 
 # What's new:
-- Now using HBase 0.20.3 for active development.
+- Now using HBase 0.20.4 for active development.
 
 - Connections to HBase are now configured via the config/connections.clj file.
   This is basically a Clojure map with connection settings.  This means that
