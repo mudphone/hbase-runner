@@ -376,17 +376,14 @@
                        (add-get-cols columns)
                        (add-get-ts timestamp)
                        (add-get-ts timestamps)
-                       )]
-       (result-column-values-to-map (.get htable the-get))
-       )
-     )
-  )
+                       )
+           result (.get htable the-get)]
+       (if-not (.isEmpty result) (result-column-values-to-map result)))))
 
 (defn delete-all-row
   "Performs a simple delete of an entire HBase table row."
   [table-name row-id]
-  (simple-delete-row table-name row-id)
-  )
+  (simple-delete-row table-name row-id))
 
 (def delete-row delete-all-row)
 (def deleteall-row delete-all-row)
