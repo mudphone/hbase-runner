@@ -357,12 +357,14 @@
             }
      column  - family:qualifier for single column
      columns - a vector of family:qualifier strings
+               default: all families
      timestamp  - a single timestamp long
                   gets only values with this timestamp
      timestamps - a vector of min and max timestamp longs
                   gets all values for selected columns in this range"
   ([table-name row-id]
-     (get-row table-name row-id {}))
+     (get-row table-name row-id
+              {:columns (bare-column-families-for table-name)}))
   ([table-name row-id {:keys [column columns timestamp timestamps]
                        :or {column nil
                             columns nil

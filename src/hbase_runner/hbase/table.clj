@@ -12,7 +12,11 @@
   (.getTableDescriptor *HBaseAdmin* (.getBytes table-name)))
 
 (defn hcolumn-families-for [table-name]
-  (.getFamilies (htable-descriptor-for table-name)))
+  (seq (.getFamilies (htable-descriptor-for table-name))))
+
+(defn bare-column-families-for [table-name]
+  (map #(.getNameAsString %) (hcolumn-families-for table-name)))
 
 (defn column-families-for [table-name]
-  (map #(str (.getNameAsString %) ":") (hcolumn-families-for table-name)))
+  (map #(str % ":") (bare-column-families-for table-name)))
+
