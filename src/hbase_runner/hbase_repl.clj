@@ -2,25 +2,11 @@
   (:import [java.io File]
            [org.apache.hadoop.hbase HConstants]
            [org.apache.hadoop.hbase.client HTable])
-  (:require [clojure.contrib [str-utils :as str-utils]])
+  (:require [clojure.contrib [str-utils :as str-utils]]
+            [hbase-runner.utils [start :as start]])
   (:use [clojure.contrib.pprint :only [pp pprint]]
         [hbase-runner.hbase column delete get put region result scan table]
-        (hbase-runner.utils clojure config file find create truncate))
-  )
-
-(defn set-current-table-ns [current-ns]
-  (dosync
-   (alter *hbase-runner-config* assoc :current-table-ns current-ns)))
-(defn current-table-ns []
-  (let [current-ns (hbr*current-table-ns)]
-    (if-not (nil? current-ns)
-      current-ns
-      (hbr*default-table-ns))))
-
-(defn print-current-settings []
-  (println "HBase Runner Home is:" (hbr*hbase-runner-home))
-  (println "System is:" (name (keyword (hbr*system))))
-  (println "Current table ns is:" (current-table-ns)))
+        [hbase-runner.utils clojure file find config create truncate]))
 
 (defn public-api []
   (sort (map first (ns-publics 'hbase-runner.hbase-repl))))
@@ -28,33 +14,10 @@
 (defn print-api []
   (pprint (public-api)))
 
-(defn start-hbase-repl
-  ([]
-     (start-hbase-repl :default))
-  ([system-or-table-ns]
-     (cond
-      (keyword? system-or-table-ns)
-      (let [system system-or-table-ns]
-        (start-hbase-repl system (current-table-ns)))
-
-      (string? system-or-table-ns)
-      (let [table-ns system-or-table-ns]
-        (start-hbase-repl :default system-or-table-ns))
-
-      :else (do
-              (println "You must provide a system name (as :keyword)"
-                       "or table namespace (as \"string\"), or both.")
-              (println "  System default is :default")
-              (println "  Table namespace default is blank"))))
-  ([system table-ns]
-     (set-current-table-ns table-ns)
-     (set-hbase-configuration system)
-     (set-hbase-admin)
-     (dosync
-      (alter *hbase-runner-config* assoc :system system))
-     (print-current-settings)))
-
+(def start-hbase-repl start/start-hbase-repl)
 (def start-hbase-runner start-hbase-repl)
+(def start-hr start-hbase-repl)
+(def hr start-hbase-repl)
 
 (defn list-all-tables []
   (map table-name-from (all-htable-descriptors)))
@@ -65,7 +28,7 @@
     tables))
 
 (defn list-tables []
-  (filter (partial is-in-table-ns (current-table-ns)) (list-all-tables)))
+  (filter (partial is-in-table-ns (start/current-table-ns)) (list-all-tables)))
 
 (defn list-tables-pp []
   (let [tables (list-tables)]
