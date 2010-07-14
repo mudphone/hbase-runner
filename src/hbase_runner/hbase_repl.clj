@@ -33,7 +33,7 @@
 (defn list-tables-pp []
   (let [tables (list-tables)]
     (pprint tables)
-    tables))
+    (count tables)))
 
 (defn find-all-tables [search-str]
   (filter-names-by search-str (list-all-tables)))
